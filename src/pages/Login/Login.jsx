@@ -55,7 +55,7 @@ const Login = () => {
         <div className="text-center mb-8">
           <Link 
             to="/" 
-            className="inline-block mb-4 text-blue-600 hover:text-blue-700 transition-colors"
+            className="inline-block mb-4 text-red-600 hover:text-red-700 transition-colors"
           >
             ← Back to Home
           </Link>
@@ -105,7 +105,7 @@ const Login = () => {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-gradient-to-r from-red-600 to-red-500 text-white py-3 px-4 rounded-lg font-medium hover:from-red-700 hover:to-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? (
             <div className="flex items-center justify-center">
@@ -123,7 +123,7 @@ const Login = () => {
         <div className="text-center space-y-4">
           <p className="text-sm text-gray-600">
             Don't have an account?{" "}
-            <Link to="/signup" className="text-blue-600 hover:text-blue-700 font-medium">
+            <Link to="/signup" className="text-red-600 hover:text-red-700 font-medium">
               Sign Up
             </Link>
           </p>

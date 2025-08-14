@@ -6,32 +6,56 @@ export default function LandingPage() {
 
   const features = [
     {
-      icon: "👥",
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+        </svg>
+      ),
       title: "Employee Management",
       description: "Comprehensive employee profiles, department organization, and role-based access control."
     },
     {
-      icon: "💰",
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+      ),
       title: "Payroll System",
       description: "Automated salary calculations, payment history, and expense management."
     },
     {
-      icon: "📊",
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      ),
       title: "Attendance Tracking",
       description: "Real-time attendance monitoring, leave management, and detailed reports."
     },
     {
-      icon: "📈",
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      ),
       title: "Analytics & Reports",
       description: "Interactive dashboards, performance metrics, and custom reporting tools."
     },
     {
-      icon: "🔔",
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
+      ),
       title: "Communication Hub",
       description: "Internal notifications, task management, and feedback systems."
     },
     {
-      icon: "🎨",
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM7 21h10a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a4 4 0 01-4 4z" />
+        </svg>
+      ),
       title: "Modern UI/UX",
       description: "Responsive design with dark/light themes and intuitive user interface."
     }
@@ -45,9 +69,9 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-red-100">
       {/* Navigation */}
-      <nav className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
+      <nav className="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
@@ -62,31 +86,31 @@ export default function LandingPage() {
                     e.target.nextSibling.style.display = 'block';
                   }}
                 />
-                <span className="hidden text-2xl font-bold text-blue-600">SmartHR</span>
+                <span className="hidden text-2xl font-bold text-red-600">SmartHR</span>
               </div>
             </div>
 
             {/* Desktop Navigation */}
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-4">
-                <a href="#features" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                <a href="#features" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                   Features
                 </a>
-                <a href="#about" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                <a href="#about" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                   About
                 </a>
-                <a href="#contact" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                <a href="#contact" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                   Contact
                 </a>
                 <Link
                   to="/signin"
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                  className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors"
                 >
                   Sign In
                 </Link>
                 <Link
                   to="/signup"
-                  className="border border-blue-600 text-blue-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 hover:text-white transition-colors"
+                  className="border border-red-600 text-red-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-600 hover:text-white transition-colors"
                 >
                   Get Started
                 </Link>
@@ -97,7 +121,7 @@ export default function LandingPage() {
             <div className="md:hidden">
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-gray-700 hover:text-blue-600 focus:outline-none focus:text-blue-600"
+                className="text-gray-700 hover:text-red-600 focus:outline-none focus:text-red-600"
               >
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   {isMenuOpen ? (
@@ -114,24 +138,24 @@ export default function LandingPage() {
           {isMenuOpen && (
             <div className="md:hidden">
               <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white rounded-lg shadow-lg mt-2">
-                <a href="#features" className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
+                <a href="#features" className="text-gray-700 hover:text-red-600 block px-3 py-2 rounded-md text-base font-medium">
                   Features
                 </a>
-                <a href="#about" className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
+                <a href="#about" className="text-gray-700 hover:text-red-600 block px-3 py-2 rounded-md text-base font-medium">
                   About
                 </a>
-                <a href="#contact" className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
+                <a href="#contact" className="text-gray-700 hover:text-red-600 block px-3 py-2 rounded-md text-base font-medium">
                   Contact
                 </a>
                 <Link
                   to="/signin"
-                  className="bg-blue-600 text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-blue-700 text-center"
+                  className="bg-red-600 text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-red-700 text-center"
                 >
                   Sign In
                 </Link>
                 <Link
                   to="/signup"
-                  className="border border-blue-600 text-blue-600 block px-3 py-2 rounded-md text-base font-medium hover:bg-blue-600 hover:text-white text-center"
+                  className="border border-red-600 text-red-600 block px-3 py-2 rounded-md text-base font-medium hover:bg-red-600 hover:text-white text-center"
                 >
                   Get Started
                 </Link>
@@ -147,7 +171,7 @@ export default function LandingPage() {
           <div className="text-center">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
               Streamline Your
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-800">
                 {" "}HR & Payroll
               </span>
             </h1>
@@ -158,13 +182,13 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 to="/signup"
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105"
+                className="bg-gradient-to-r from-red-600 to-red-700 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:from-red-700 hover:to-red-800 transition-all transform hover:scale-105"
               >
-                Start Free Trial
+                Get Started Free
               </Link>
               <Link
                 to="/dashboard"
-                className="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-lg text-lg font-semibold hover:border-blue-600 hover:text-blue-600 transition-colors"
+                className="border-2 border-red-600 text-red-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-red-600 hover:text-white transition-colors"
               >
                 View Demo
               </Link>
@@ -174,10 +198,10 @@ export default function LandingPage() {
           {/* Hero Image/Dashboard Preview */}
           <div className="mt-16 relative">
             <div className="bg-white rounded-xl shadow-2xl p-4 mx-auto max-w-4xl">
-              <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-8">
+              <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-8">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="bg-white p-6 rounded-lg shadow-sm">
-                    <div className="text-3xl font-bold text-blue-600">125</div>
+                    <div className="text-3xl font-bold text-red-600">125</div>
                     <div className="text-gray-600">Total Employees</div>
                   </div>
                   <div className="bg-white p-6 rounded-lg shadow-sm">
@@ -185,7 +209,7 @@ export default function LandingPage() {
                     <div className="text-gray-600">Attendance Rate</div>
                   </div>
                   <div className="bg-white p-6 rounded-lg shadow-sm">
-                    <div className="text-3xl font-bold text-purple-600">$245K</div>
+                    <div className="text-3xl font-bold text-red-700">$245K</div>
                     <div className="text-gray-600">Monthly Payroll</div>
                   </div>
                 </div>
@@ -201,7 +225,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
               <div key={index} className="text-center">
-                <div className="text-3xl sm:text-4xl font-bold text-blue-600 mb-2">{stat.number}</div>
+                <div className="text-3xl sm:text-4xl font-bold text-red-600 mb-2">{stat.number}</div>
                 <div className="text-gray-600">{stat.label}</div>
               </div>
             ))}
@@ -225,7 +249,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
               <div key={index} className="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                <div className="text-4xl mb-4">{feature.icon}</div>
+                <div className="text-red-600 mb-4">{feature.icon}</div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-3">{feature.title}</h3>
                 <p className="text-gray-600">{feature.description}</p>
               </div>
@@ -248,7 +272,7 @@ export default function LandingPage() {
               </p>
               <div className="space-y-4">
                 <div className="flex items-center">
-                  <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center mr-3">
+                  <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center mr-3">
                     <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
@@ -256,7 +280,7 @@ export default function LandingPage() {
                   <span className="text-gray-700">Cloud-based and secure</span>
                 </div>
                 <div className="flex items-center">
-                  <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center mr-3">
+                  <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center mr-3">
                     <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
@@ -264,7 +288,7 @@ export default function LandingPage() {
                   <span className="text-gray-700">Easy integration with existing systems</span>
                 </div>
                 <div className="flex items-center">
-                  <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center mr-3">
+                  <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center mr-3">
                     <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
@@ -272,7 +296,7 @@ export default function LandingPage() {
                   <span className="text-gray-700">24/7 customer support</span>
                 </div>
                 <div className="flex items-center">
-                  <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center mr-3">
+                  <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center mr-3">
                     <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
@@ -281,7 +305,7 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
-            <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-8 rounded-2xl">
+            <div className="bg-gradient-to-br from-red-50 to-red-100 p-8 rounded-2xl">
               <div className="space-y-4">
                 <div className="bg-white p-4 rounded-lg shadow-sm">
                   <div className="flex items-center justify-between">
@@ -292,13 +316,13 @@ export default function LandingPage() {
                 <div className="bg-white p-4 rounded-lg shadow-sm">
                   <div className="flex items-center justify-between">
                     <span className="text-gray-600">Processing Time</span>
-                    <span className="text-blue-600 font-semibold">↓ 75%</span>
+                    <span className="text-red-600 font-semibold">↓ 75%</span>
                   </div>
                 </div>
                 <div className="bg-white p-4 rounded-lg shadow-sm">
                   <div className="flex items-center justify-between">
                     <span className="text-gray-600">Manual Errors</span>
-                    <span className="text-purple-600 font-semibold">↓ 90%</span>
+                    <span className="text-red-700 font-semibold">↓ 90%</span>
                   </div>
                 </div>
               </div>
@@ -308,24 +332,24 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-purple-600 py-16">
+      <section className="bg-gradient-to-r from-red-600 to-red-700 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Ready to Transform Your HR Operations?
           </h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-red-100 mb-8 max-w-2xl mx-auto">
             Join thousands of companies that have already streamlined their HR and payroll processes with our solution.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/signup"
-              className="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors"
+              className="bg-white text-red-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors"
             >
               Get Started Today
             </Link>
             <a
               href="#contact"
-              className="border-2 border-white text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors"
+              className="border-2 border-white text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-white hover:text-red-600 transition-colors"
             >
               Contact Sales
             </a>
@@ -395,7 +419,7 @@ export default function LandingPage() {
           
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
             <p>&copy; 2025 HR and Payroll Management System. All rights reserved.</p>
-            <p className="mt-2">Built with ❤️ by <a href="https://github.com/rashedrefat" className="text-blue-400 hover:text-blue-300">Rashed Refat</a></p>
+            <p className="mt-2">Built with ❤️ by <a href="https://github.com/rashedrefat" className="text-red-400 hover:text-red-300">Rashed Refat</a></p>
           </div>
         </div>
       </footer>
