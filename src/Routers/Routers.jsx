@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import NotFoundPage from "../pages/NotFoundPage";
 import Overview from "../pages/OverviewPage";
+import LandingPage from "../pages/LandingPage";
 
 // Layouts
 import BlankLayout from "../layouts/BlankLayout";
@@ -14,9 +15,12 @@ import Dashboard from "../pages/Dashboard";
 export default function Routers() {
   return (
     <Routes>
+      {/* Landing page without layout */}
+      <Route path="/" element={<LandingPage />} />
+      
       {/* Main layout routes */}
       <Route element={<MainLayout />}>
-        <Route index element={<Overview />} />
+        <Route path="overview" element={<Overview />} />
         <Route path="dashboard" element={<Dashboard />} />
       </Route>
 
