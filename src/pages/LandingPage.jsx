@@ -8,7 +8,7 @@ export default function LandingPage() {
     {
       icon: (
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
         </svg>
       ),
       title: "Employee Management",
@@ -195,23 +195,21 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Hero Image/Dashboard Preview */}
+          {/* Hero Cards */}
           <div className="mt-16 relative">
-            <div className="bg-white rounded-xl shadow-2xl p-4 mx-auto max-w-4xl">
-              <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-8">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="bg-white p-6 rounded-lg shadow-sm">
-                    <div className="text-3xl font-bold text-red-600">125</div>
-                    <div className="text-gray-600">Total Employees</div>
-                  </div>
-                  <div className="bg-white p-6 rounded-lg shadow-sm">
-                    <div className="text-3xl font-bold text-green-600">98%</div>
-                    <div className="text-gray-600">Attendance Rate</div>
-                  </div>
-                  <div className="bg-white p-6 rounded-lg shadow-sm">
-                    <div className="text-3xl font-bold text-red-700">$245K</div>
-                    <div className="text-gray-600">Monthly Payroll</div>
-                  </div>
+            <div className="max-w-6xl mx-auto px-4 sm:px-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-red-100 hover:shadow-xl hover:bg-red-50 hover:border-red-200 transition-all duration-300 transform hover:scale-105 cursor-pointer">
+                  <div className="text-3xl sm:text-4xl font-bold text-red-600 mb-2">125</div>
+                  <div className="text-base sm:text-lg text-gray-600">Total Employees</div>
+                </div>
+                <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-green-100 hover:shadow-xl hover:bg-green-50 hover:border-green-200 transition-all duration-300 transform hover:scale-105 cursor-pointer">
+                  <div className="text-3xl sm:text-4xl font-bold text-green-600 mb-2">98%</div>
+                  <div className="text-base sm:text-lg text-gray-600">Attendance Rate</div>
+                </div>
+                <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-red-100 hover:shadow-xl hover:bg-red-50 hover:border-red-300 transition-all duration-300 transform hover:scale-105 cursor-pointer sm:col-span-2 lg:col-span-1">
+                  <div className="text-3xl sm:text-4xl font-bold text-red-700 mb-2">$245K</div>
+                  <div className="text-base sm:text-lg text-gray-600">Monthly Payroll</div>
                 </div>
               </div>
             </div>

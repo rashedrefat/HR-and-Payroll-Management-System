@@ -5,12 +5,26 @@ export default function Brand() {
   const { user } = useAuth();
 
   return (
-    <Link to={user ? "/dashboard" : "/"}>
+    <Link to={user ? "/dashboard" : "/"} className="flex items-center gap-3 group">
       <img
-        className="w-[230px] h-auto object-contain -ml-5"
+        className="w-10 h-10 object-contain"
         src="/images/smarthrlogo2.png"
         alt="brand-logo"
+        onError={(e) => {
+          e.target.style.display = 'none';
+          e.target.nextSibling.style.display = 'flex';
+        }}
       />
+      {/* Fallback logo */}
+      <div className="w-10 h-10 bg-white rounded-lg hidden items-center justify-center">
+        <span className="text-red-600 font-bold text-sm">HR</span>
+      </div>
+      <div>
+        <h2 className="text-xl font-bold text-white group-hover:text-red-100 transition-colors">
+          SmartHR
+        </h2>
+        <p className="text-xs text-red-200">Payroll System</p>
+      </div>
     </Link>
   );
 }

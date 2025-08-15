@@ -1,72 +1,33 @@
 @import "tailwindcss";
 
-@theme {
-  /* Theme Colors - Vibrant Primary */
-  --color-red-theme: #ff4d6d; /* Vibrant Rose Red */
-  --color-green-theme: #1ed760; /* Spotify Green */
-  --color-text-theme-sec  : #6e7b8b; /* Muted Steel Blue */
-  --color-default-theme: #FFFFFF; /* Deep Charcoal */
-  --color-dark-theme: #FFFFFF; /* Discord Dark */
-  --color-dark-theme-primary: #1a1d21; /* Soft Black */
-  --color-dark-700: #101215;
-  --color-dark-200: #050506;
-
-  /* Brand Colors - Gradient Inspired */
-  --color-brand-50: #f1f8ff;
-  --color-brand-100: #dbeafe;
-  --color-brand-200: #bfdbfe;
-  --color-brand-300: #93c5fd;
-  --color-brand-400: #60a5fa;
-  --color-brand-base: #3b82f6; /* Bright Blue */
-  --color-brand-600: #2563eb; /* Royal Blue */
-  --color-brand-700: #1d4ed8;
-  --color-brand-800: #1e40af;
-  --color-brand-900: #1e3a8a;
-  --color-brand-950: #172554;
-
-  /* Gray Colors - Modern Neutral Set */
-  --color-gray-50: #f9fafb;
-  --color-gray-100: #f3f4f6;
-  --color-gray-200: #e5e7eb;
-  --color-gray-300: #d1d5db;
-  --color-gray-base: #9ca3af; /* Mid Gray */
-  --color-gray-500: #6b7280;
-  --color-gray-600: #4b5563;
-  --color-gray-700: #374151;
-  --color-gray-800: #1f2937;
-  --color-gray-900: #111827;
-  --color-gray-950: #0a0f1c;
-
-  /* Dark Mode Layers */
-  --color-dark-bg-layer-1: #FF0000; /* Red */
-  --color-dark-bg-layer-2: #181b20;
-  --color-dark-border-layer-1: #1f2227;
-
-  /* Special */
-  --color-glass-bg: rgba(255, 255, 255, 0.07);
+/* Custom CSS variables and styles */
+:root {
+  --color-red-theme: #ff4d6d;
+  --color-green-theme: #1ed760;
+  --color-text-theme-sec: #6e7b8b;
+  --color-default-theme: #FFFFFF;
+  --color-dark-theme: #1a1d21;
+  --color-dark-theme-primary: #1a1d21;
 }
 
-/* width */
+/* Scrollbar Styles */
 ::-webkit-scrollbar {
   width: 6px;
 }
 
-/* Track */
 ::-webkit-scrollbar-track {
   box-shadow: inset 0 0 5px rgb(247, 1, 1);
   height: 10px;
   border-radius: 10px;
 }
 
-/* Handle */
 ::-webkit-scrollbar-thumb {
-  background:  #ff4d6d;
+  background: #ff4d6d;
   border-radius: 10px;
 }
 
-/* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #f7e9e9
+  background: #f7e9e9;
 }
 
 ::selection {

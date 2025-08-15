@@ -22,9 +22,9 @@ const Sidebar = () => {
       >
         <aside
           id="sidebar"
-          className={`w-[250px] h-screen bg-dark-bg-layer-1 fixed top-0 ${
+          className={`w-[250px] h-screen bg-red-600 fixed top-0 ${
             isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-          } transform transition-transform duration-300 ease-in-out lg:translate-x-0 overflow-y-auto z-50`}
+          } transform transition-transform duration-300 ease-in-out lg:translate-x-0 overflow-y-auto z-50 shadow-xl`}
         >
           <div className="px-8 py-3.5 hidden lg:block">
             <Brand />
