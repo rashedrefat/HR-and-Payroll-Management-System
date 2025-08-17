@@ -1,11 +1,8 @@
 import { Link } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
 
 export default function Brand() {
-  const { user } = useAuth();
-
   return (
-    <Link to={user ? "/dashboard" : "/"} className="flex items-center gap-3 group">
+    <Link to="/" className="flex items-center gap-3 group">
       <img
         className="w-10 h-10 object-contain"
         src="/images/smarthrlogo2.png"

@@ -156,8 +156,8 @@ const AttendanceBarChart = () => {
               type: 'linear',
               x: 0, y: 0, x2: 0, y2: 1,
               colorStops: [
-                { offset: 0, color: '#34D399' },
-                { offset: 0.7, color: '#10B981' },
+                { offset: 0, color: '#31e6a3ff' },
+                { offset: 0.7, color: '#18cc87ff' },
                 { offset: 1, color: '#047857' }
               ]
             },

@@ -85,7 +85,7 @@ export const adminLinks = [
   
 ];
 
-export const defaultImage = "https://mui.com/static/images/avatar/2.jpg";
+export const defaultImage = "/images/profile-photo.jpg"; // Replace with your actual photo filename
 
 // default data for table and dropdown's
 export const productCategories = [

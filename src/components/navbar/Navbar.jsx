@@ -1,14 +1,19 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { themeStatus, toggle } from "../../features/theme/themeSlice";
 import { toggle as drawerToggle } from "../../features/drawer/drawerSlice";
+import { useAuth } from "../hooks/useAuth";
 import Notification from "../notification/Notification";
 import Overlay from "../overlay/Overlay";
 import SearchBar from "./SearchBar";
 import Toggler from "./Toggler";
+import LoggedInUserInfoButton from "./LoggedInUserInfoButton";
 
 export default function Navbar() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const currentTheme = useSelector(themeStatus);
   const [notificationPopup, setNotificationPopup] = useState(false);
 
@@ -50,8 +55,8 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Right section */}
-          <div className="flex items-center space-x-4">
+                    {/* Right section */}
+          <div className="flex items-center space-x-3">
             {/* Theme Toggle */}
             <div className="hidden md:flex md:items-center bg-gray-50 backdrop-blur-sm rounded-xl px-3 py-2 border border-gray-200">
               <Toggler
@@ -84,12 +89,19 @@ export default function Navbar() {
             </div>
 
             {/* User Section */}
-            <button className="inline-flex items-center px-6 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-red-600 to-red-500 border-2 border-red-600 rounded-xl shadow-lg hover:from-red-700 hover:to-red-600 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:ring-offset-2 focus:ring-offset-white transition-all duration-300 transform hover:scale-105">
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-              </svg>
-              Sign In
-            </button>
+            {user ? (
+              <LoggedInUserInfoButton user={user} />
+            ) : (
+              <button 
+                onClick={() => navigate("/signin")}
+                className="inline-flex items-center px-6 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-red-600 to-red-500 border-2 border-red-600 rounded-xl shadow-lg hover:from-red-700 hover:to-red-600 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:ring-offset-2 focus:ring-offset-white transition-all duration-300 transform hover:scale-105"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                </svg>
+                Sign In
+              </button>
+            )}
           </div>
         </div>
 

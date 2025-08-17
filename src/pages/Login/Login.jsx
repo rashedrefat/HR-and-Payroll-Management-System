@@ -19,8 +19,8 @@ const Login = () => {
         // Mock user data - replace with actual API response
         const mockUser = {
           id: 1,
-          firstName: "John",
-          lastName: "Doe",
+          firstName: "Rashed",
+          lastName: "Refat",
           email: email,
           profilePicture: null,
           role: "admin"

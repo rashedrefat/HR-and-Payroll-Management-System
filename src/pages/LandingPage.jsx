@@ -218,15 +218,64 @@ export default function LandingPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="bg-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+      <section className="relative bg-gradient-to-r from-red-600 via-red-700 to-red-800 py-16 overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-y-1"></div>
+          <div className="absolute top-0 left-0 w-full h-full">
+            <div className="grid grid-cols-8 gap-4 transform rotate-12 scale-150 opacity-30">
+              {[...Array(32)].map((_, i) => (
+                <div key={i} className="w-2 h-2 bg-white/20 rounded-full animate-pulse" style={{animationDelay: `${i * 0.1}s`}}></div>
+              ))}
+            </div>
+          </div>
+        </div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Section Title */}
+          <div className="text-center mb-12">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+              Trusted by Industry Leaders
+            </h2>
+            <div className="w-24 h-1 bg-white/30 mx-auto rounded-full"></div>
+          </div>
+          
+          {/* Stats Counter Grid */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
             {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-3xl sm:text-4xl font-bold text-red-600 mb-2">{stat.number}</div>
-                <div className="text-gray-600">{stat.label}</div>
+              <div key={index} className="text-center group">
+                {/* Counter Container */}
+                <div className="relative">
+                  {/* Animated Border Ring */}
+                  <div className="absolute inset-0 rounded-full border-2 border-white/20 group-hover:border-white/40 transition-all duration-500 animate-pulse"></div>
+                  <div className="absolute inset-2 rounded-full border border-white/10 group-hover:border-white/30 transition-all duration-500"></div>
+                  
+                  {/* Counter Circle */}
+                  <div className="relative bg-white/10 backdrop-blur-sm rounded-full w-24 h-24 sm:w-28 sm:h-28 mx-auto flex items-center justify-center group-hover:bg-white/20 transition-all duration-500 group-hover:scale-110">
+                    <div className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight">
+                      {stat.number}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Label */}
+                <div className="mt-6 space-y-1">
+                  <div className="text-white/90 font-semibold text-sm sm:text-base lg:text-lg leading-tight px-2">
+                    {stat.label}
+                  </div>
+                  <div className="w-8 h-0.5 bg-white/40 mx-auto rounded-full group-hover:w-12 group-hover:bg-white/60 transition-all duration-500"></div>
+                </div>
               </div>
             ))}
+          </div>
+          
+          {/* Bottom Accent */}
+          <div className="mt-12 flex justify-center">
+            <div className="flex space-x-2">
+              <div className="w-2 h-2 bg-white/40 rounded-full animate-bounce" style={{animationDelay: '0s'}}></div>
+              <div className="w-2 h-2 bg-white/40 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+              <div className="w-2 h-2 bg-white/40 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+            </div>
           </div>
         </div>
       </section>
