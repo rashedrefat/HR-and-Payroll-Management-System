@@ -11,6 +11,7 @@ import MainLayout from "../layouts/MainLayout";
 import Login from "../pages/Login/Login";
 import Registration from "../pages/Registration/Registration";
 import Dashboard from "../pages/Dashboard";
+import Company from "../pages/Company/Company";
 import Allemployee from "../pages/Allemployee";
 
 export default function Routers() {
@@ -23,6 +24,7 @@ export default function Routers() {
       <Route element={<MainLayout />}>
         <Route path="overview" element={<Overview />} />
         <Route path="dashboard" element={<Dashboard />} />
+        <Route path="company" element={<Company />} />
         <Route path="employee">
           <Route index element={<Allemployee />} />
         </Route>

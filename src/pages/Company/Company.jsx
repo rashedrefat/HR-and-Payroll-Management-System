@@ -19,9 +19,9 @@ const Company = () => {
   });
 
   const [hrInfo, setHrInfo] = useState({
-    name: "Rashida Rahman",
+    name: "Jamila Khatun",
     position: "Chief Human Resources Officer",
-    email: "rashida.rahman@smarthr-solutions.com.bd",
+    email: "jamila.khatun@smarthr-solutions.com.bd",
     phone: "+880 1800-234567",
     experience: "12 years",
     education: "MBA in Human Resources Management, University of Dhaka",
@@ -29,7 +29,7 @@ const Company = () => {
     department: "Human Resources",
     joinDate: "January 2019",
     directReports: 8,
-    bio: "Rashida leads our HR initiatives with a focus on employee engagement, talent development, and organizational culture in the Bangladeshi business environment. She brings extensive experience in strategic HR planning and has successfully implemented numerous workforce development programs across various industries in Bangladesh."
+    bio: "Jamila leads our HR initiatives with a focus on employee engagement, talent development, and organizational culture in the Bangladeshi business environment. She brings extensive experience in strategic HR planning and has successfully implemented numerous workforce development programs across various industries in Bangladesh."
   });
 
   const handleCompanyEdit = (field, value) => {
@@ -68,13 +68,12 @@ const Company = () => {
   };
 
   return (
-    <div className={`min-h-screen bg-gray-50 p-4 sm:p-6 ${styles.companyContainer}`}>
-      <div className="max-w-7xl mx-auto">
-        {/* Page Header */}
-        <div className={`mb-8 ${styles.pageHeader}`}>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Company Information</h1>
-          <p className="text-gray-600">Comprehensive overview of company details and HR leadership</p>
-        </div>
+    <div className="space-y-6 p-4 sm:p-6">
+      {/* Page Header */}
+      <div className={`${styles.pageHeader}`}>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Company Information</h1>
+        <p className="text-sm sm:text-base text-gray-600">Comprehensive overview of company details and HR leadership</p>
+      </div>
 
         {/* Tab Navigation */}
         <div className={`mb-6 ${styles.tabNavigation}`}>
@@ -555,7 +554,6 @@ const Company = () => {
             </div>
           </div>
         )}
-      </div>
     </div>
   );
 };
