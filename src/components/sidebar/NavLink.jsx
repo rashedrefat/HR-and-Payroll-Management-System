@@ -6,16 +6,13 @@ import ChildNavLink from "./ChildNavLink";
 export default function NavLink({ routeInfo }) {
   const [open, setOpen] = useState(true);
 
-  const handleExpand = () => {
-    setOpen(!open);
-  };
-
   const handleClick = (e) => {
-    if (routeInfo.extend && routeInfo.extend.length > 0) {
+    // Only prevent default and handle expand if it has children AND user clicked the expand arrow
+    if (routeInfo.extend?.length > 0 && e.target.closest(".expand-arrow")) {
       e.preventDefault();
-      handleExpand();
+      setOpen(!open);
     }
-    // For routes without extend, let React Router handle the navigation
+    // Otherwise let the navigation happen naturally
   };
 
   return (
@@ -25,9 +22,10 @@ export default function NavLink({ routeInfo }) {
           to={routeInfo.link}
           className={({ isActive }) => `
             flex h-12 items-center gap-4 px-3 py-2 rounded-lg transition-colors duration-200 group
-            ${isActive 
-              ? 'bg-red-800 text-white shadow-lg' 
-              : 'text-white hover:bg-red-700'
+            ${
+              isActive
+                ? "bg-red-800 text-white shadow-lg"
+                : "text-white hover:bg-red-700"
             }
           `}
           onClick={handleClick}
@@ -39,13 +37,23 @@ export default function NavLink({ routeInfo }) {
               alt={routeInfo.title}
               className="w-6 h-6"
               onError={(e) => {
-                e.target.style.display = 'none';
-                e.target.nextSibling.style.display = 'block';
+                e.target.style.display = "none";
+                e.target.nextSibling.style.display = "block";
               }}
             />
             {/* Fallback SVG icon */}
-            <svg className="w-6 h-6 text-gray-600 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="w-6 h-6 text-gray-600 hidden"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </div>
 
@@ -58,9 +66,23 @@ export default function NavLink({ routeInfo }) {
 
           {/* Expand/Collapse arrow for items with children */}
           {routeInfo.extend && routeInfo.extend.length > 0 && (
-            <div className={`transition-transform duration-200 ${open ? 'rotate-90' : ''}`}>
-              <svg className="w-4 h-4 text-gray-500 group-hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            <div
+              className={`expand-arrow transition-transform duration-200 ${
+                open ? "rotate-90" : ""
+              }`}
+            >
+              <svg
+                className="w-4 h-4 text-gray-500 group-hover:text-red-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             </div>
           )}
