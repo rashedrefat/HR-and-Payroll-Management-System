@@ -12,7 +12,7 @@ const StatCard = ({ icon, title, value, color = 'blue' }) => {
     <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 flex justify-between items-center transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer group">
       <div className="flex-1">
         <h3 className="text-gray-600 text-sm font-medium mb-2 group-hover:text-gray-700 transition-colors">{title}</h3>
-        <p className="text-3xl font-bold text-gray-900 group-hover:text-gray-800 transition-colors">{value}</p>
+        <p className="text-2xl font-bold text-gray-900 group-hover:text-gray-800 transition-colors">{value}</p>
       </div>
       <div className={`w-14 h-14 rounded-xl bg-gradient-to-r ${colorSchemes[color]} flex items-center justify-center shadow-lg transform transition-all duration-300 group-hover:scale-110 group-hover:shadow-xl`}>
         <div className="text-white">
@@ -87,7 +87,7 @@ DashboardStats.propTypes = {
   totalEmployees: PropTypes.number.isRequired,
   todayPresent: PropTypes.number.isRequired,
   todayAbsent: PropTypes.number.isRequired,
-  monthlyPayroll: PropTypes.string.isRequired,
+  monthlyPayroll: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
 };
 
 export default DashboardStats;

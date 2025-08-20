@@ -13,6 +13,7 @@ import Registration from "../pages/Registration/Registration";
 import Dashboard from "../pages/Dashboard";
 import Company from "../pages/Company/Company";
 import Allemployee from "../pages/Allemployee";
+import LeaveApplication from "../pages/LeaveApplication";
 
 export default function Routers() {
   return (
@@ -27,6 +28,9 @@ export default function Routers() {
         <Route path="company" element={<Company />} />
         <Route path="employee">
           <Route index element={<Allemployee />} />
+        </Route>
+        <Route path="leave">
+          <Route index element={<LeaveApplication />} />
         </Route>
       </Route>
 

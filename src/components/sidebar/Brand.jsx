@@ -4,8 +4,8 @@ export default function Brand() {
   return (
     <Link to="/" className="flex items-center gap-3 group">
       <img
-        className="w-10 h-10 object-contain"
-        src="/images/smarthrlogo2.png"
+        className="w-auto h-8"
+        src="/images/smarthrlogo.png"
         alt="brand-logo"
         onError={(e) => {
           e.target.style.display = 'none';
@@ -13,14 +13,14 @@ export default function Brand() {
         }}
       />
       {/* Fallback logo */}
-      <div className="w-10 h-10 bg-white rounded-lg hidden items-center justify-center">
-        <span className="text-red-600 font-bold text-sm">HR</span>
+      <div className="w-12 h-12 bg-gray-900 group-hover:bg-red-600 rounded-lg hidden items-center justify-center transition-colors duration-200">
+        <span className="text-white font-bold text-lg">HR</span>
       </div>
       <div>
-        <h2 className="text-xl font-bold text-white group-hover:text-red-100 transition-colors">
+        <h2 className="text-xl font-bold text-gray-900 group-hover:text-red-600 transition-colors">
           SmartHR
         </h2>
-        <p className="text-xs text-red-200">Payroll System</p>
+        <p className="text-sm text-gray-600">Payroll System</p>
       </div>
     </Link>
   );

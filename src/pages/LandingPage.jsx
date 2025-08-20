@@ -78,7 +78,7 @@ export default function LandingPage() {
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <img
-                  className="h-8 w-auto"
+                  className="h-15 w-auto"
                   src="/images/smarthrlogo.png"
                   alt="SmartHR"
                   onError={(e) => {
@@ -208,7 +208,7 @@ export default function LandingPage() {
                   <div className="text-base sm:text-lg text-gray-600">Attendance Rate</div>
                 </div>
                 <div className="bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-red-100 hover:shadow-xl hover:bg-red-50 hover:border-red-300 transition-all duration-300 transform hover:scale-105 cursor-pointer sm:col-span-2 lg:col-span-1">
-                  <div className="text-3xl sm:text-4xl font-bold text-red-700 mb-2">$245K</div>
+                  <div className="text-3xl sm:text-4xl font-bold text-red-700 mb-2"><span className="font-black">৳</span>24.5L</div>
                   <div className="text-base sm:text-lg text-gray-600">Monthly Payroll</div>
                 </div>
               </div>

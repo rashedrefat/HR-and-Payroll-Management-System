@@ -1,10 +1,13 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
-import { NavLink as NavigationLink } from "react-router-dom";
+import { NavLink as NavigationLink, useLocation } from "react-router-dom";
 import ChildNavLink from "./ChildNavLink";
 
 export default function NavLink({ routeInfo }) {
   const [open, setOpen] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
+  const location = useLocation();
+  const isActive = location.pathname === `/${routeInfo.link}`;
 
   const handleClick = (e) => {
     // Only prevent default and handle expand if it has children AND user clicked the expand arrow
@@ -21,21 +24,30 @@ export default function NavLink({ routeInfo }) {
         <NavigationLink
           to={routeInfo.link}
           className={({ isActive }) => `
-            flex h-12 items-center gap-4 px-3 py-2 rounded-lg transition-colors duration-200 group
+            flex h-12 items-center gap-4 px-3 py-2 rounded-lg transition-all duration-300 transform group
             ${
               isActive
-                ? "bg-red-800 text-white shadow-lg"
-                : "text-white hover:bg-red-700"
+                ? "bg-red-600 text-white shadow-lg scale-105"
+                : "text-gray-700 hover:bg-red-100 hover:text-red-700 hover:scale-105 hover:shadow-lg hover:border-red-300 border border-transparent"
             }
           `}
           onClick={handleClick}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
         >
           {/* Left section with icon */}
           <div className="w-6 flex-shrink-0">
             <img
               src={routeInfo.icon}
               alt={routeInfo.title}
-              className="w-6 h-6"
+              className="w-6 h-6 transition-all duration-200"
+              style={{
+                filter: isActive 
+                  ? 'brightness(0) invert(1)' 
+                  : isHovered 
+                    ? 'brightness(0) saturate(100%) invert(27%) sepia(89%) saturate(3072%) hue-rotate(338deg) brightness(89%) contrast(82%)' 
+                    : 'brightness(0)'
+              }}
               onError={(e) => {
                 e.target.style.display = "none";
                 e.target.nextSibling.style.display = "block";
@@ -43,7 +55,9 @@ export default function NavLink({ routeInfo }) {
             />
             {/* Fallback SVG icon */}
             <svg
-              className="w-6 h-6 text-gray-600 hidden"
+              className={`w-6 h-6 hidden transition-colors duration-200 ${
+                isActive ? 'text-white' : isHovered ? 'text-red-600' : 'text-black'
+              }`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -72,7 +86,9 @@ export default function NavLink({ routeInfo }) {
               }`}
             >
               <svg
-                className="w-4 h-4 text-gray-500 group-hover:text-red-500"
+                className={`w-4 h-4 transition-colors duration-200 ${
+                  isActive ? 'text-white' : isHovered ? 'text-red-600' : 'text-black'
+                }`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

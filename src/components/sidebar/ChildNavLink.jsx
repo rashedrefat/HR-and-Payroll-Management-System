@@ -6,11 +6,11 @@ export default function ChildNavLink({ routeInfo }) {
     <div className="ml-6 mb-2 relative sub-menu">
       <NavLink
         to={routeInfo.link}
-                  className={({ isActive }) => `
-            flex h-10 items-center gap-3 px-6 py-2 rounded-lg transition-colors duration-200 group
+        className={({ isActive }) => `
+            flex h-10 items-center gap-3 px-6 py-2 rounded-lg transition-all duration-300 transform group border border-transparent
             ${isActive 
-              ? 'bg-red-800 text-white shadow-lg' 
-              : 'text-red-100 hover:bg-red-700 hover:text-white'
+              ? 'bg-red-600 text-white shadow-lg scale-105' 
+              : 'text-gray-600 hover:bg-red-100 hover:text-red-700 hover:scale-105 hover:shadow-lg hover:border-red-300'
             }
           `}
       >
