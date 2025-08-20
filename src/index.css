@@ -16,18 +16,18 @@
 }
 
 ::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 5px rgb(247, 1, 1);
+  box-shadow: inset 0 0 5px rgb(223, 209, 209);
   height: 10px;
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #ff4d6d;
+  background: #f8a2b2;
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #f7e9e9;
+  background: #f76868;
 }
 
 ::selection {

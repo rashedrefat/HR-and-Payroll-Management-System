@@ -28,8 +28,7 @@ export default function Navbar() {
   return (
     <>
       <nav className="bg-white shadow-lg border-b border-gray-200 ml-0 lg:ml-[250px] sticky top-0 z-20 backdrop-blur-sm">
-        <div className="flex items-center justify-between h-16 px-4 sm:px-6">
-          {/* Left section */}
+        <div className="flex items-center justify-between h-20 px-4 sm:px-6">
           <div className="flex items-center space-x-4">
             <button
               onClick={() => dispatch(drawerToggle())}
@@ -48,14 +47,12 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Center section - Mobile search */}
           <div className="flex-1 max-w-sm sm:hidden mx-4">
             <div className="relative">
               <SearchBar className="w-full h-10 bg-gray-50 backdrop-blur-sm border border-gray-200 rounded-xl text-gray-900 placeholder-gray-500 focus:bg-white focus:border-red-300 transition-all duration-300" />
             </div>
           </div>
 
-                    {/* Right section */}
           <div className="flex items-center space-x-3">
             {/* Theme Toggle */}
             <div className="hidden md:flex md:items-center bg-gray-50 backdrop-blur-sm rounded-xl px-3 py-2 border border-gray-200">

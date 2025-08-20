@@ -15,10 +15,7 @@ export const adminLinks = [
     title: "All Employee",
     icon: "/icons/employee.svg",
     link: "employee",
-    extend: [
-      { title: "Remote Employee", link: "tasks/remote-employee" },
-
-    ],
+    
   },
   {
     title: "Leave Application",

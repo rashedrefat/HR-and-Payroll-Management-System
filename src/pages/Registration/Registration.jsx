@@ -77,8 +77,41 @@ const Registration = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 py-8">
-      <form onSubmit={handleSubmit} className="bg-white w-full max-w-md mx-4 p-8 rounded-2xl shadow-2xl space-y-6">
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden py-8">
+      {/* HR-themed background with red touches */}
+      <div className="absolute inset-0 bg-gradient-to-br from-red-50 via-white to-blue-50"></div>
+      
+      {/* Decorative elements with red accents */}
+      <div className="absolute top-10 right-10 w-36 h-36 bg-red-200/30 rounded-full blur-3xl"></div>
+      <div className="absolute top-60 left-20 w-28 h-28 bg-blue-300/20 rounded-full blur-2xl"></div>
+      <div className="absolute bottom-20 right-20 w-44 h-44 bg-red-100/40 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-60 left-10 w-24 h-24 bg-red-200/30 rounded-full blur-xl"></div>
+      
+      {/* Business-themed icons background with red touches */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute top-16 right-1/4 text-red-400">
+          <svg className="w-14 h-14" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/>
+          </svg>
+        </div>
+        <div className="absolute top-32 left-1/3 text-blue-300">
+          <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+          </svg>
+        </div>
+        <div className="absolute bottom-40 left-1/4 text-red-300">
+          <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M9 11H7v6h2v-6zm4 0h-2v6h2v-6zm4 0h-2v6h2v-6zm2.5-9H19v2h-3V2H8v2H5V2H3.5C2.67 2 2 2.67 2 3.5V20c0 .83.67 1.5 1.5 1.5H19c.83 0 1.5-.67 1.5-1.5V3.5C20.5 2.67 19.83 2 19 2h-.5z"/>
+          </svg>
+        </div>
+        <div className="absolute top-48 right-1/3 text-red-200">
+          <svg className="w-11 h-11" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zM4 18v-1c0-1.1.9-2 2-2s2 .9 2 2v1h2v-1c0-2.2-1.8-4-4-4s-4 1.8-4 4v1h2zm8-10c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 1c-2.2 0-4 1.8-4 4v4h2v-4c0-1.1.9-2 2-2s2 .9 2 2v4h2v-4c0-2.2-1.8-4-4-4z"/>
+          </svg>
+        </div>
+      </div>
+      
+      <form onSubmit={handleSubmit} className="relative bg-white/95 backdrop-blur-sm w-full max-w-md mx-4 p-8 rounded-2xl shadow-2xl border border-red-100 space-y-6 z-10">
         <div className="text-center mb-8">
           <Link 
             to="/" 
@@ -86,8 +119,15 @@ const Registration = () => {
           >
             ← Back to Home
           </Link>
-          <h2 className="text-3xl font-bold text-gray-800">Create Account</h2>
-          <p className="text-gray-600 mt-2">Join us to get started with your HR management.</p>
+          <div className="mb-4">
+            <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center mx-auto shadow-lg">
+              <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+              </svg>
+            </div>
+          </div>
+          <h2 className="text-3xl font-bold text-gray-800">Join Our Team</h2>
+          <p className="text-gray-600 mt-2">Create your HR account to get started</p>
         </div>
 
         <div className="grid grid-cols-2 gap-4">

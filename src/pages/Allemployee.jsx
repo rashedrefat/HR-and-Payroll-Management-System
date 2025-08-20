@@ -35,7 +35,7 @@ const tableData = [
     id: 2,
     name: {
       title: "Rifat Bandhan",
-      image: "/images/profile-photo.jpg",
+      image: "/images/bandhan-pic.jpg",
       visibleCheckbox: true,
     },
     email: "bandhan@gmail.com",
@@ -50,7 +50,7 @@ const tableData = [
     id: 3,
     name: {
       title: "Sadia Afrin",
-      image: "/images/profile-photo.jpg",
+      image: "/images/sadia-pic.jpg",
       visibleCheckbox: true,
     },
     email: "sadia@gmail.com",
@@ -65,7 +65,7 @@ const tableData = [
     id: 4,
     name: {
       title: "Mazaharul Auntu",
-      image: "/images/profile-photo.jpg",
+      image: "/images/auntu-pic.jpg",
       visibleCheckbox: true,
     },
     email: "auntu@gmail.com",
@@ -80,7 +80,7 @@ const tableData = [
     id: 5,
     name: {
       title: "Shahariar Islam",
-      image: "/images/profile-photo.jpg",
+      image: "/images/shahriar-pic.jpg",
       visibleCheckbox: true,
     },
     email: "shahriar@gmail.com",
@@ -95,7 +95,7 @@ const tableData = [
     id: 6,
     name: {
       title: "Lina Rahman",
-      image: "/images/profile-photo.jpg",
+      image: "/images/lina-pic.jpeg",
       visibleCheckbox: true,
     },
     email: "lina@gmail.com",

@@ -106,7 +106,7 @@ const Company = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Company Logo & Basic Info */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8 h-fit">
+              <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8 h-fit transition-all duration-300 hover:shadow-2xl hover:scale-102 hover:-translate-y-1 cursor-pointer">
                 <div className="flex justify-between items-start mb-6">
                   <div className="flex-1">
                     <div className="text-center">
@@ -202,7 +202,7 @@ const Company = () => {
 
             {/* Detailed Company Information */}
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8">
+              <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8 transition-all duration-300 hover:shadow-2xl hover:scale-102 hover:-translate-y-1 cursor-pointer">
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-xl font-bold text-gray-900">Company Details</h3>
                   <button
@@ -311,7 +311,7 @@ const Company = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* HR Profile Card */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8 h-fit">
+              <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8 h-fit transition-all duration-300 hover:shadow-2xl hover:scale-102 hover:-translate-y-1 cursor-pointer">
                 <div className="flex justify-between items-start mb-6">
                   <div className="flex-1">
                     <div className="text-center">
@@ -412,7 +412,7 @@ const Company = () => {
 
             {/* HR Detailed Information */}
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8">
+              <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8 transition-all duration-300 hover:shadow-2xl hover:scale-102 hover:-translate-y-1 cursor-pointer">
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-xl font-bold text-gray-900">HR Leadership Details</h3>
                   <button

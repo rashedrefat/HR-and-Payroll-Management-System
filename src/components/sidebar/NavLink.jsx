@@ -28,7 +28,7 @@ export default function NavLink({ routeInfo }) {
             ${
               isActive
                 ? "bg-red-600 text-white shadow-lg scale-105"
-                : "text-gray-700 hover:bg-red-100 hover:text-red-700 hover:scale-105 hover:shadow-lg hover:border-red-300 border border-transparent"
+                : "text-black hover:bg-red-100 hover:text-red-700 hover:scale-105 hover:shadow-lg hover:border-red-300 border border-transparent"
             }
           `}
           onClick={handleClick}
