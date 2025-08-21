@@ -1,11 +1,9 @@
 import React from 'react';
 
 // Removed duplicate LeaveApplication component and default export
-import { Link } from "react-router-dom";
 import Table from "../components/table/Table";
 import { useState } from "react";
 import AllEmployeeRow from "../components/table/rows/LeaveApplicationRow";
-import IconButton from "../components/buttons/IconButton";
 
 const tableLabels = [
   { title: "Name", sort: true },
@@ -113,6 +111,20 @@ const tableData = [
 
 export default function LeaveApplication() {
   const [select, setSelect] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Filter table data based on search term
+  const filteredData = tableData.filter((employee) => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      employee.name.title.toLowerCase().includes(searchLower) ||
+      employee.email.toLowerCase().includes(searchLower) ||
+      employee.employeeId.toLowerCase().includes(searchLower) ||
+      employee.mobile.includes(searchTerm) ||
+      employee.department.toLowerCase().includes(searchLower) ||
+      employee.designation.toLowerCase().includes(searchLower)
+    );
+  });
 
   const resetSelection = () => setSelect([]);
 
@@ -126,7 +138,7 @@ export default function LeaveApplication() {
 
   const selectAll = (e) => {
     if (e.target.checked) {
-      setSelect(tableData.map((data) => data.id));
+      setSelect(filteredData.map((data) => data.id));
     } else {
       resetSelection();
     }
@@ -136,15 +148,22 @@ export default function LeaveApplication() {
     <section className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-semibold text-gray-800">Leave Application</h2>
-        <Link to="/leave/add">
-          <IconButton
-            text="Add Leave Application"
-            color="text-white"
-            bg="bg-red-600"
-            icon="/icons/plus-Icon.svg"
-            className="hover:bg-red-700"
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search employees..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none w-64"
           />
-        </Link>
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <img 
+              src="/icons/search-icon.svg" 
+              alt="Search" 
+              className="h-5 w-5 text-gray-400"
+            />
+          </div>
+        </div>
       </div>
 
       <div className="bg-white rounded-lg shadow">
@@ -152,12 +171,12 @@ export default function LeaveApplication() {
           selectAll={selectAll}
           selectRow={handleSelect}
           selectedData={select}
-          dataSet={tableData.length}
+          dataSet={filteredData.length}
           tableLabels={tableLabels}
           itemsPerPage={10}
           resetSelection={resetSelection}
         >
-          {tableData.map((data) => (
+          {filteredData.map((data) => (
             <AllEmployeeRow
               key={data.id}
               data={data}
