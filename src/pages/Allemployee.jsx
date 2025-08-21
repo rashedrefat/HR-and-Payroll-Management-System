@@ -95,7 +95,7 @@ const tableData = [
     id: 6,
     name: {
       title: "Lina Rahman",
-      image: "/images/lina-pic.jpeg",
+      image: "/images/lina-pic.jpg",
       visibleCheckbox: true,
     },
     email: "lina@gmail.com",

@@ -12,7 +12,7 @@ import Login from "../pages/Login/Login";
 import Registration from "../pages/Registration/Registration";
 import Dashboard from "../pages/Dashboard";
 import Company from "../pages/Company/Company";
-import Allemployee from "../pages/Allemployee";
+import Allemployee from "../pages/AllEmployee";
 import LeaveApplication from "../pages/LeaveApplication";
 
 export default function Routers() {
