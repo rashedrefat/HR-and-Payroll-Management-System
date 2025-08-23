@@ -10,7 +10,7 @@ export default function TableData({
     <td
       className={`${fullBorder ? "border" : "border-b"} ${
         ignoreXPadding ? "py-3" : "p-2 xs:p-3"
-      } ${className} border-red-50 text-sm dark:text-gray-800 border-r`}
+      } ${className} border-red-50 text-sm dark:text-gray-800 border-r text-center`}
     >
       {children}
     </td>

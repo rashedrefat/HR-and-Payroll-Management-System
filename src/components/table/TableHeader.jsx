@@ -24,14 +24,14 @@ export default function TableHeader({
           ) => (
             <th
               key={index}
-              className={`p-3 text-gray-900 py-4 text-sm font-medium dark:text-gray-800 leading-none 
+              className={`p-3 text-gray-900 py-4 text-sm font-medium dark:text-gray-800 leading-none text-center
  ${width ? width : "w-full md:w-auto"} ${
                 !revealOnResponsive ? "hidden md:table-cell" : "table-cell"
               }`}
             >
               <span
-                className={`inline-flex gap-1 items-center ${
-                  floatRight ? "float-right md:float-left" : "float-left"
+                className={`inline-flex gap-1 items-center justify-center ${
+                  floatRight ? "float-right md:float-none" : ""
                 } ${nowrap ? "whitespace-nowrap" : "whitespace-normal"}`}
               >
                 {checkbox && (

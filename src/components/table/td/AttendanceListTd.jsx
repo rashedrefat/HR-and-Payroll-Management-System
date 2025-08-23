@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 
-export default function LeaveApplicationTd({
+export default function AttendanceListTd({
   data,
   selectRow = () => false,
   selectedData,
@@ -28,7 +28,7 @@ export default function LeaveApplicationTd({
   );
 }
 
-LeaveApplicationTd.propTypes = {
+AttendanceListTd.propTypes = {
   data: PropTypes.object.isRequired,
   selectRow: PropTypes.func,
   selectedData: PropTypes.array,

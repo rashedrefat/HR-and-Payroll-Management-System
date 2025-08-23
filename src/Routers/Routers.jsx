@@ -14,6 +14,8 @@ import Dashboard from "../pages/Dashboard";
 import Company from "../pages/Company/Company";
 import Allemployee from "../pages/AllEmployee";
 import LeaveApplication from "../pages/LeaveApplication";
+import AttendanceList from "../pages/AttendanceList";
+import OfficeNotice from "../pages/OfficeNotice";
 
 export default function Routers() {
   return (
@@ -31,6 +33,12 @@ export default function Routers() {
         </Route>
         <Route path="leave">
           <Route index element={<LeaveApplication />} />
+        </Route>
+        <Route path="attendance">
+          <Route index element={<AttendanceList />} />
+        </Route>
+        <Route path="notice">
+          <Route index element={<OfficeNotice />} />
         </Route>
       </Route>
 

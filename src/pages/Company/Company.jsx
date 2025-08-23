@@ -68,12 +68,14 @@ const Company = () => {
   };
 
   return (
-    <div className="space-y-6 p-4 sm:p-6">
+    <section className="px-6 py-8">
       {/* Page Header */}
-      <div className={`${styles.pageHeader}`}>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Company Information</h1>
-        <p className="text-sm sm:text-base text-gray-600">Comprehensive overview of company details and HR leadership</p>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 tracking-tight font-inter">Company</h1>
+        <p className="text-gray-600 mt-2">Manage company information and organizational details</p>
       </div>
+
+      <div className="space-y-6">
 
         {/* Tab Navigation */}
         <div className={`mb-6 ${styles.tabNavigation}`}>
@@ -554,7 +556,8 @@ const Company = () => {
             </div>
           </div>
         )}
-    </div>
+      </div>
+    </section>
   );
 };
 

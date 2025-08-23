@@ -6,7 +6,10 @@ export default function OverviewPage() {
   return (
     <section className="p-4 sm:p-6">
       <h1 className="sr-only">Overview section</h1>
-      <div className="text-black text-3xl font-bold mb-6">Welcome, Rashedul!</div>
+      <div className="mb-6">
+        <div className="text-black text-3xl font-bold">Welcome, Rashedul!</div>
+        <p className="text-gray-600 mt-2">Get insights into company performance and employee statistics</p>
+      </div>
       
       <div className="space-y-6">
         <DashboardStats 
