@@ -1,12 +1,15 @@
 import PropTypes from "prop-types";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 
 export default function ChildNavLink({ routeInfo }) {
+  const location = useLocation();
+  const isActive = location.pathname === `/${routeInfo.link}`;
+
   return (
     <div className="ml-6 mb-2 relative sub-menu">
       <NavLink
         to={routeInfo.link}
-        className={({ isActive }) => `
+        className={`
             flex h-10 items-center gap-3 px-6 py-2 rounded-lg transition-all duration-300 transform group border border-transparent
             ${isActive 
               ? 'bg-red-600 text-white shadow-lg scale-105' 
@@ -14,11 +17,11 @@ export default function ChildNavLink({ routeInfo }) {
             }
           `}
       >
-        {/* Bullet point */}
-        <div className="w-1.5 h-1.5 rounded-full bg-current opacity-60"></div>
-        <span className="text-sm leading-tight whitespace-nowrap">
-          {routeInfo.title}
-        </span>
+        {/* Bullet point - Enhanced visibility */}
+        <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 mr-2 ${
+          isActive ? 'bg-white' : 'bg-gray-700'
+        }`}></div>
+        <span className="text-sm leading-tight whitespace-nowrap">{routeInfo.title}</span>
       </NavLink>
     </div>
   );

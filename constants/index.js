@@ -42,12 +42,9 @@ export const adminLinks = [
     icon: "/icons/settings.svg",
     link: "settings",
     extend: [
-      { title: "Time Management", link: "settings/time-management" },
-      { title: "Attendance Settings", link: "settings/attendance-settings" },
+      { title: "Time and Attendance", link: "settings/time-attendance" },
       { title: "Leave Settings", link: "settings/leave-settings" },
       { title: "Employee Settings", link: "settings/employee-settings" },
-      { title: "Vacation", link: "settings/vacation" },
-
     ],
   },
   {
@@ -55,10 +52,8 @@ export const adminLinks = [
     icon: "/icons/payroll.svg",
     link: "payroll",
     extend: [
-      { title: "Salary Settings", link: "payroll/salary-settings" },
-      { title: "Salary List", link: "payroll/salary-list" },
+      { title: "Salary", link: "payroll/salary-settings" },
       { title: "Increment", link: "payroll/increment" },
-      { title: "Increment History", link: "payroll/increment-history" },
     ],
   },
     {

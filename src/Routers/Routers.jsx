@@ -16,6 +16,14 @@ import Allemployee from "../pages/AllEmployee";
 import LeaveApplication from "../pages/LeaveApplication";
 import AttendanceList from "../pages/AttendanceList";
 import OfficeNotice from "../pages/OfficeNotice";
+import ExpenseList from "../pages/expense/ExpenseList";
+import TimeAttendanceSettings from "../pages/TimeAttendanceSettings";
+import Settings from "../pages/Settings";
+import LeaveSettings from "../pages/LeaveSettings";
+import EmployeeSettings from "../pages/EmployeeSettings";
+import Salary from "../pages/Salary";
+import Payroll from "../pages/Payroll";
+import Increment from "../pages/Increment";
 
 export default function Routers() {
   return (
@@ -39,6 +47,20 @@ export default function Routers() {
         </Route>
         <Route path="notice">
           <Route index element={<OfficeNotice />} />
+        </Route>
+        <Route path="expense">
+          <Route index element={<ExpenseList />} />
+        </Route>
+        <Route path="settings">
+          <Route index element={<Settings />} />
+          <Route path="time-attendance" element={<TimeAttendanceSettings />} />
+          <Route path="leave-settings" element={<LeaveSettings />} />
+          <Route path="employee-settings" element={<EmployeeSettings />} />
+        </Route>
+        <Route path="payroll">
+          <Route index element={<Payroll />} />
+          <Route path="salary-settings" element={<Salary />} />
+          <Route path="increment" element={<Increment />} />
         </Route>
       </Route>
 
