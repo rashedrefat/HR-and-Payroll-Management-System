@@ -6,6 +6,7 @@ import LandingPage from "../pages/LandingPage";
 // Layouts
 import BlankLayout from "../layouts/BlankLayout";
 import MainLayout from "../layouts/MainLayout";
+import EmployeeLayout from "../layouts/EmployeeLayout";
 
 // Pages
 import Login from "../pages/Login/Login";
@@ -24,6 +25,16 @@ import EmployeeSettings from "../pages/EmployeeSettings";
 import Salary from "../pages/Salary";
 import Payroll from "../pages/Payroll";
 import Increment from "../pages/Increment";
+import Timeline from "../pages/Timeline";
+
+// Employee Portal Pages
+import EmployeeLogin from "../pages/employee/EmployeeLogin";
+import EmployeeDashboard from "../pages/employee/EmployeeDashboard";
+import EmployeeProfile from "../pages/employee/EmployeeProfile";
+import EmployeePayslips from "../pages/employee/EmployeePayslips";
+import EmployeeAttendance from "../pages/employee/EmployeeAttendance";
+import EmployeeLeaveRequests from "../pages/employee/EmployeeLeaveRequests";
+import EmployeeNotices from "../pages/employee/EmployeeNotices";
 
 export default function Routers() {
   return (
@@ -45,6 +56,9 @@ export default function Routers() {
         <Route path="attendance">
           <Route index element={<AttendanceList />} />
         </Route>
+        <Route path="timeline">
+          <Route index element={<Timeline />} />
+        </Route>
         <Route path="notice">
           <Route index element={<OfficeNotice />} />
         </Route>
@@ -61,6 +75,19 @@ export default function Routers() {
           <Route index element={<Payroll />} />
           <Route path="salary-settings" element={<Salary />} />
           <Route path="increment" element={<Increment />} />
+        </Route>
+      </Route>
+
+      {/* Employee Portal Routes */}
+      <Route path="employee">
+        <Route path="login" element={<EmployeeLogin />} />
+        <Route element={<EmployeeLayout />}>
+          <Route path="dashboard" element={<EmployeeDashboard />} />
+          <Route path="profile" element={<EmployeeProfile />} />
+          <Route path="payslips" element={<EmployeePayslips />} />
+          <Route path="attendance" element={<EmployeeAttendance />} />
+          <Route path="leave-requests" element={<EmployeeLeaveRequests />} />
+          <Route path="notices" element={<EmployeeNotices />} />
         </Route>
       </Route>
 
