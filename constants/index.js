@@ -67,10 +67,11 @@ export const adminLinks = [
     icon: "/icons/reports.svg",
     link: "reports",
     extend: [
-      { title: "Expense Reports", link: "reports/expense-reports" },
+      { title: "Employee Reports", link: "reports/employee-reports" },
       { title: "Attendance Reports", link: "reports/attendance-reports" },
       { title: "Leave Reports", link: "reports/leave-reports" },
-      { title: "Visit Reports", link: "reports/visit-reports" },
+      { title: "Payroll Reports", link: "reports/payroll-reports" },
+      { title: "Expense Reports", link: "reports/expense-reports" },
     ],
   },
 

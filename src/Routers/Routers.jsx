@@ -26,6 +26,10 @@ import Salary from "../pages/Salary";
 import Payroll from "../pages/Payroll";
 import Increment from "../pages/Increment";
 import Timeline from "../pages/Timeline";
+import EmployeeReport from "../pages/EmployeeReport";
+import AttendanceReport from "../pages/AttendanceReport";
+import LeaveReport from "../pages/LeaveReport";
+import PayrollReport from "../pages/PayrollReport";
 
 // Employee Portal Pages
 import EmployeeLogin from "../pages/employee/EmployeeLogin";
@@ -75,6 +79,12 @@ export default function Routers() {
           <Route index element={<Payroll />} />
           <Route path="salary-settings" element={<Salary />} />
           <Route path="increment" element={<Increment />} />
+        </Route>
+        <Route path="reports">
+          <Route path="employee-reports" element={<EmployeeReport />} />
+          <Route path="attendance-reports" element={<AttendanceReport />} />
+          <Route path="leave-reports" element={<LeaveReport />} />
+          <Route path="payroll-reports" element={<PayrollReport />} />
         </Route>
       </Route>
 

@@ -102,12 +102,47 @@ export default function LandingPage() {
                 <a href="#contact" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                   Contact
                 </a>
-                <Link
-                  to="/signin"
-                  className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors"
-                >
-                  Sign In
-                </Link>
+                {/* Portal Access Dropdown */}
+                <div className="relative group">
+                  <button className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors flex items-center space-x-1">
+                    <span>Sign In</span>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                    <div className="py-2">
+                      <Link
+                        to="/signin"
+                        className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+                      >
+                        <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                          <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                          </svg>
+                        </div>
+                        <div>
+                          <div className="font-medium">Admin/HR Portal</div>
+                          <div className="text-xs text-gray-500">Full system access</div>
+                        </div>
+                      </Link>
+                      <Link
+                        to="/employee/login"
+                        className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                      >
+                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                          <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <div className="font-medium">Employee Portal</div>
+                          <div className="text-xs text-gray-500">Personal dashboard</div>
+                        </div>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
                 <Link
                   to="/signup"
                   className="border border-red-600 text-red-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-600 hover:text-white transition-colors"
@@ -147,12 +182,23 @@ export default function LandingPage() {
                 <a href="#contact" className="text-gray-700 hover:text-red-600 block px-3 py-2 rounded-md text-base font-medium">
                   Contact
                 </a>
-                <Link
-                  to="/signin"
-                  className="bg-red-600 text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-red-700 text-center"
-                >
-                  Sign In
-                </Link>
+                <div className="border-t border-gray-200 mt-2 pt-2">
+                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-1">
+                    Sign In Options
+                  </div>
+                  <Link
+                    to="/signin"
+                    className="bg-red-600 text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-red-700 mx-2 mb-2"
+                  >
+                    🏢 Admin/HR Portal
+                  </Link>
+                  <Link
+                    to="/employee/login"
+                    className="bg-blue-600 text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-blue-700 mx-2"
+                  >
+                    👤 Employee Portal
+                  </Link>
+                </div>
                 <Link
                   to="/signup"
                   className="border border-red-600 text-red-600 block px-3 py-2 rounded-md text-base font-medium hover:bg-red-600 hover:text-white text-center"
@@ -275,6 +321,128 @@ export default function LandingPage() {
               <div className="w-2 h-2 bg-white/40 rounded-full animate-bounce" style={{animationDelay: '0s'}}></div>
               <div className="w-2 h-2 bg-white/40 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
               <div className="w-2 h-2 bg-white/40 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Portal Access Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              Choose Your Portal
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Access the system through your dedicated portal based on your role and responsibilities.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {/* Admin/HR Portal Card */}
+            <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-red-200">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Admin/HR Portal</h3>
+                <p className="text-gray-600 mb-6">
+                  Complete system access for HR managers and administrators. Manage employees, payroll, reports, and system settings.
+                </p>
+                <div className="space-y-2 mb-8">
+                  <div className="flex items-center justify-center text-sm text-gray-700">
+                    <svg className="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Employee Management
+                  </div>
+                  <div className="flex items-center justify-center text-sm text-gray-700">
+                    <svg className="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Payroll & Reports
+                  </div>
+                  <div className="flex items-center justify-center text-sm text-gray-700">
+                    <svg className="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    System Administration
+                  </div>
+                </div>
+                <Link
+                  to="/signin"
+                  className="inline-flex items-center justify-center w-full px-6 py-3 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition-colors shadow-lg hover:shadow-xl"
+                >
+                  Access Admin Portal
+                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              </div>
+            </div>
+
+            {/* Employee Portal Card */}
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-blue-200">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Employee Portal</h3>
+                <p className="text-gray-600 mb-6">
+                  Personal dashboard for employees. View your profile, payslips, attendance records, and submit leave requests.
+                </p>
+                <div className="space-y-2 mb-8">
+                  <div className="flex items-center justify-center text-sm text-gray-700">
+                    <svg className="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Personal Dashboard
+                  </div>
+                  <div className="flex items-center justify-center text-sm text-gray-700">
+                    <svg className="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Attendance & Payslips
+                  </div>
+                  <div className="flex items-center justify-center text-sm text-gray-700">
+                    <svg className="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Leave Requests
+                  </div>
+                </div>
+                <Link
+                  to="/employee/login"
+                  className="inline-flex items-center justify-center w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl"
+                >
+                  Access Employee Portal
+                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Demo Credentials */}
+          <div className="mt-12 max-w-4xl mx-auto">
+            <div className="bg-gray-50 rounded-xl p-6 border-2 border-dashed border-gray-300">
+              <h4 className="text-lg font-semibold text-gray-900 mb-4 text-center">Demo Credentials</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="text-center">
+                  <h5 className="font-medium text-red-600 mb-2">Admin/HR Access</h5>
+                  <p className="text-sm text-gray-600">Use your admin credentials</p>
+                </div>
+                <div className="text-center">
+                  <h5 className="font-medium text-blue-600 mb-2">Employee Access</h5>
+                  <p className="text-sm text-gray-600">ID: <span className="font-mono bg-white px-2 py-1 rounded">EMP-001</span></p>
+                  <p className="text-sm text-gray-600">Password: <span className="font-mono bg-white px-2 py-1 rounded">password</span></p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
