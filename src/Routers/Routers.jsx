@@ -30,6 +30,7 @@ import EmployeeReport from "../pages/EmployeeReport";
 import AttendanceReport from "../pages/AttendanceReport";
 import LeaveReport from "../pages/LeaveReport";
 import PayrollReport from "../pages/PayrollReport";
+import ExpenseReport from "../pages/ExpenseReport";
 
 // Employee Portal Pages
 import EmployeeLogin from "../pages/employee/EmployeeLogin";
@@ -85,6 +86,7 @@ export default function Routers() {
           <Route path="attendance-reports" element={<AttendanceReport />} />
           <Route path="leave-reports" element={<LeaveReport />} />
           <Route path="payroll-reports" element={<PayrollReport />} />
+          <Route path="expense-reports" element={<ExpenseReport />} />
         </Route>
       </Route>
 
