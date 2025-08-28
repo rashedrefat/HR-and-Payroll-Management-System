@@ -106,7 +106,7 @@ export default function EmployeeAttendance() {
               />
             </div>
           </div>
-          <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
             <img src="/icons/export.svg" alt="Export" className="h-4 w-4" />
             <span>Export</span>
           </button>
@@ -225,6 +225,7 @@ export default function EmployeeAttendance() {
         <div className="overflow-x-auto">
           <Table
             tableLabels={tableLabels}
+            dataSet={filteredData.length}
             itemsPerPage={10}
           >
             {filteredData.map((data, index) => (

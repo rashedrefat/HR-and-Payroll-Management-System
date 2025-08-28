@@ -3,16 +3,16 @@ import React, { useState } from "react";
 export default function EmployeeProfile() {
   const [employeeData, setEmployeeData] = useState({
     name: "Rashedul Islam",
-    employeeId: "EMP-001",
-    email: "rashedul@company.com",
-    phone: "+8801712345678",
+    employeeId: "EMP-82382",
+    email: "rashedul@smarthr.com",
+    phone: "+8801934478672",
     department: "Web Development",
     designation: "Senior Web Developer",
     joinDate: "2023-01-15",
     address: "Dhaka, Bangladesh",
-    emergencyContact: "+8801912345678",
+    emergencyContact: "+8801915620577",
     bloodGroup: "O+",
-    dateOfBirth: "1995-03-20",
+    dateOfBirth: "2000-09-14",
   });
 
   const [isEditing, setIsEditing] = useState(false);
@@ -52,7 +52,7 @@ export default function EmployeeProfile() {
               onClick={() => setIsEditing(true)}
               className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
             >
-              <img src="/icons/fi-sr-pencil.svg" alt="Edit" className="h-4 w-4" />
+              <img src="/icons/pencil.svg" alt="Edit" className="h-4 w-4" />
               Edit Profile
             </button>
           )}

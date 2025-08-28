@@ -12,22 +12,27 @@
 
 /* Scrollbar Styles */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 5px rgb(223, 209, 209);
-  height: 10px;
-  border-radius: 10px;
+  background: #f1f5f9;
+  border-radius: 6px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #f8a2b2;
-  border-radius: 10px;
+  background: #cbd5e1;
+  border-radius: 6px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #f76868;
+  background: #94a3b8;
+}
+
+/* Horizontal scrollbar specific styling */
+::-webkit-scrollbar:horizontal {
+  height: 4px;
 }
 
 ::selection {

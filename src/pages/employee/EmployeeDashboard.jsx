@@ -3,11 +3,11 @@ import React from "react";
 export default function EmployeeDashboard() {
   const employeeData = {
     name: "Rashedul Islam",
-    employeeId: "EMP-001",
+    employeeId: "EMP-82382",
     department: "Web Development",
     designation: "Senior Web Developer",
-    email: "rashedul@company.com",
-    phone: "+8801712345678",
+    email: "rashedul@smarthr.com",
+    phone: "+8801934478672",
     joinDate: "2023-01-15",
   };
 

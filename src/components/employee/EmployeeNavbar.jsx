@@ -12,24 +12,28 @@ export default function EmployeeNavbar() {
 
   return (
     <nav className="bg-white shadow-lg border-b border-gray-200 fixed w-full top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo and Brand */}
-          <div className="flex items-center">
-            <Link to="/employee/dashboard" className="flex items-center space-x-3">
+      <div className="flex">
+        {/* Logo and Brand - Aligned with Sidebar */}
+        <div className="w-64 flex items-center px-6 h-16 border-r border-gray-200">
+          <div className="flex items-center space-x-3">
+            <Link to="/" className="flex items-center">
               <img 
                 src="/images/smarthrlogo.png" 
                 alt="SmartHR" 
-                className="h-8 w-auto"
+                className="h-12 w-auto hover:opacity-80 transition-opacity"
+                title="Go to Home"
               />
-              <div className="text-xl font-bold text-gray-900">
-                Employee Portal
-              </div>
+            </Link>
+            <Link to="/employee/dashboard" className="text-xl font-semibold text-gray-900 hover:text-red-600 transition-colors">
+              Employee Portal
             </Link>
           </div>
+        </div>
 
+        {/* Rest of navbar content */}
+        <div className="flex-1 flex justify-between items-center px-4 sm:px-6 lg:px-8 h-16">
           {/* Search Bar */}
-          <div className="hidden md:block flex-1 max-w-md mx-8">
+          <div className="hidden md:block flex-1 max-w-md ml-1 mr-8">
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <img 

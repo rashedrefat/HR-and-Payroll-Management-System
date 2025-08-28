@@ -13,9 +13,9 @@ export default function EmployeeLogin() {
     e.preventDefault();
     
     // Simple authentication logic (in a real app, this would be an API call)
-    if (formData.employeeId === "EMP-001" && formData.password === "password") {
+    if (formData.employeeId === "EMP-82382" && formData.password === "123456") {
       localStorage.setItem("employee", JSON.stringify({
-        id: "EMP-001",
+        id: "EMP-82382",
         name: "Rashedul Islam",
         department: "Web Development",
         designation: "Senior Web Developer"

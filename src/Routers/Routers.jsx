@@ -30,7 +30,7 @@ import EmployeeReport from "../pages/EmployeeReport";
 import AttendanceReport from "../pages/AttendanceReport";
 import LeaveReport from "../pages/LeaveReport";
 import PayrollReport from "../pages/PayrollReport";
-import ExpenseReport from "../pages/ExpenseReport";
+import ExpenseReports from "../pages/ExpenseReports";
 
 // Employee Portal Pages
 import EmployeeLogin from "../pages/employee/EmployeeLogin";
@@ -86,7 +86,7 @@ export default function Routers() {
           <Route path="attendance-reports" element={<AttendanceReport />} />
           <Route path="leave-reports" element={<LeaveReport />} />
           <Route path="payroll-reports" element={<PayrollReport />} />
-          <Route path="expense-reports" element={<ExpenseReport />} />
+          <Route path="expense-reports" element={<ExpenseReports />} />
         </Route>
       </Route>
 
@@ -102,6 +102,9 @@ export default function Routers() {
           <Route path="notices" element={<EmployeeNotices />} />
         </Route>
       </Route>
+
+      {/* Employee Dashboard Redirect for backwards compatibility */}
+      <Route path="/employee-dashboard" element={<Navigate to="/employee/dashboard" replace />} />
 
       {/* Blank layout routes */}
       <Route element={<BlankLayout />}>
