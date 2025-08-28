@@ -42,7 +42,7 @@ export default function EmployeeSidebar() {
   };
 
   return (
-    <aside className="fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-white shadow-lg border-r border-gray-200 overflow-y-auto z-40">
+    <aside className="fixed left-0 top-20 h-[calc(100vh-5rem)] w-64 bg-white shadow-lg border-r border-gray-200 overflow-y-auto z-40">
       <div className="p-4">
         {/* Employee Info */}
         <div className="bg-gradient-to-r from-red-50 to-red-100 rounded-lg p-4 mb-6">
@@ -57,7 +57,7 @@ export default function EmployeeSidebar() {
                 {JSON.parse(localStorage.getItem("employee") || "{}")?.name || "Rashedul Islam"}
               </h3>
               <p className="text-xs text-gray-600">
-                ID: {JSON.parse(localStorage.getItem("employee") || "{}")?.id || "EMP-001"}
+                ID: EMP-82382
               </p>
             </div>
           </div>

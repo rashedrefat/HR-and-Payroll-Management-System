@@ -144,7 +144,7 @@ const Login = () => {
               onClick={() => setLoginType("employee")}
               className={`p-3 rounded-lg text-sm font-medium transition-all border-2 ${
                 loginType === "employee"
-                  ? "bg-blue-50 border-blue-500 text-blue-700"
+                  ? "bg-red-50 border-red-500 text-red-700"
                   : "bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100"
               }`}
               disabled={isLoading}
@@ -170,7 +170,7 @@ const Login = () => {
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder={loginType === "admin" ? "Enter your email" : "Enter your employee ID or email"}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-sm"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all text-sm"
               disabled={isLoading}
             />
           </div>
@@ -185,7 +185,7 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
               placeholder="Enter your password"
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-sm pr-12"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all text-sm pr-12"
               disabled={isLoading}
             />
             <button
@@ -206,7 +206,7 @@ const Login = () => {
           className={`w-full py-3 px-4 rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
             loginType === "admin"
               ? "bg-gradient-to-r from-red-600 to-red-500 text-white hover:from-red-700 hover:to-red-600 focus:ring-red-500"
-              : "bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-700 hover:to-blue-600 focus:ring-blue-500"
+              : "bg-gradient-to-r from-red-600 to-red-500 text-white hover:from-red-700 hover:to-red-600 focus:ring-red-500"
           }`}
         >
           {isLoading ? (

@@ -9,7 +9,7 @@ export default function EmployeeLayout() {
     <div className="relative min-h-screen bg-gray-50">
       <EmployeeNavbar />
       <EmployeeSidebar />
-      <main className="ml-64 pt-16 min-h-[calc(100vh-4rem)]">
+      <main className="ml-64 pt-20 min-h-[calc(100vh-5rem)]">
         <ScrollToTop>
           <Outlet />
         </ScrollToTop>
