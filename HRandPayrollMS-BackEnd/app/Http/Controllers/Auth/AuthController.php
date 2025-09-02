@@ -38,6 +38,7 @@ class AuthController extends Controller
             'email'            => 'required|email|unique:users,email',
             'phone'            => 'nullable|string',
             'password'         => 'required|string|min:6|confirmed',
+            'role'             => 'required|string|in:employee,admin',
         ]);
 
         $user = User::create([
@@ -51,25 +52,35 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
         $refreshToken = $refreshTokenService->create($user); // ✅ create refresh token
 
-        $tenant = new Tenant();
-        $tenant->user_id = $user->id;
-        $tenant->updated_by = $user->id;
-        $tenant->save();
+        // Handle role assignment based on selection
+        if ($request->role === 'admin') {
+            // Admin registration - create tenant and assign super_admin role
+            $tenant = new Tenant();
+            $tenant->user_id = $user->id;
+            $tenant->updated_by = $user->id;
+            $tenant->save();
 
-        $user->tenant_id = $tenant->id;
-        $user->role_id = 2;
-        $user->save();
+            $user->tenant_id = $tenant->id;
+            $user->role_id = 2; // Admin role
+            $user->save();
 
-        $user->assignRole('super_admin');
-
-
-        SystemLogger::log('info', "New super admin registered: {$user->email}", $user->id);
+            $user->assignRole('super_admin');
+            SystemLogger::log('info', "New super admin registered: {$user->email}", $user->id);
+        } else {
+            // Employee registration - they need to be assigned to an existing tenant
+            $user->role_id = 1; // Employee role
+            $user->save();
+            
+            $user->assignRole('employee');
+            SystemLogger::log('info', "New employee registered: {$user->email}", $user->id);
+        }
 
         return response()->json([
             'message' => 'User registered successfully',
-            'user'    => $user,
+            'user'    => $user->load('roles'), // Load roles to include in response
             'token'   => $token,
             'refresh_token'  => $refreshToken,  // ✅ include refresh token
+            'role'    => $request->role, // Include selected role in response
         ], 201);
     }
 
