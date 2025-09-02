@@ -38,7 +38,6 @@ class AuthController extends Controller
             'email'            => 'required|email|unique:users,email',
             'phone'            => 'nullable|string',
             'password'         => 'required|string|min:6|confirmed',
-            'role'             => 'required|string|in:admin,employee', // Add role validation
         ]);
 
         $user = User::create([
@@ -52,34 +51,25 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
         $refreshToken = $refreshTokenService->create($user); // ✅ create refresh token
 
-        // Set role based on user selection
-        if ($request->role === 'admin') {
-            $tenant = new Tenant();
-            $tenant->user_id = $user->id;
-            $tenant->updated_by = $user->id;
-            $tenant->save();
+        $tenant = new Tenant();
+        $tenant->user_id = $user->id;
+        $tenant->updated_by = $user->id;
+        $tenant->save();
 
-            $user->tenant_id = $tenant->id;
-            $user->role_id = 2; // Admin role
-            $user->save();
+        $user->tenant_id = $tenant->id;
+        $user->role_id = 2;
+        $user->save();
 
-            $user->assignRole('super_admin');
-            SystemLogger::log('info', "New super admin registered: {$user->email}", $user->id);
-        } else {
-            // Employee registration - they need to be assigned to an existing tenant
-            $user->role_id = 1; // Employee role
-            $user->save();
-            
-            $user->assignRole('employee');
-            SystemLogger::log('info', "New employee registered: {$user->email}", $user->id);
-        }
+        $user->assignRole('super_admin');
+
+
+        SystemLogger::log('info', "New super admin registered: {$user->email}", $user->id);
 
         return response()->json([
             'message' => 'User registered successfully',
-            'user'    => $user->load('roles'), // Load roles to include in response
+            'user'    => $user,
             'token'   => $token,
             'refresh_token'  => $refreshToken,  // ✅ include refresh token
-            'role'    => $request->role, // Include selected role in response
         ], 201);
     }
 
@@ -96,20 +86,13 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
         $refreshToken = $refreshTokenService->create($user); // ✅
 
-        // Determine user role
-        $userRole = 'employee'; // default
-        if ($user->role_id === 2 || $user->hasRole('super_admin')) {
-            $userRole = 'admin';
-        }
-
         SystemLogger::log('info', "User logged in: {$user->email}", $user->id);
 
         return response()->json([
             'message'        => 'Login successful',
-            'user'           => $user->load('roles'), // Load roles
+            'user'           => $user,
             'access_token'   => $token,
             'refresh_token'  => $refreshToken,
-            'role'          => $userRole, // Include role in response
         ]);
     }
 

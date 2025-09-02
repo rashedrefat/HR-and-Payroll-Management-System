@@ -12,7 +12,7 @@ class RoleSeeder extends Seeder
     {
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
 
-        $roles = ['hrms_owner', 'super_admin', 'employee']; // add 'manager', 'staff' when needed
+        $roles = ['hrms_owner', 'super_admin']; // add 'manager', 'staff' when needed
 
         foreach ($roles as $role) {
             Role::firstOrCreate([
