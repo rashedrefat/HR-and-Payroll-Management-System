@@ -29,5 +29,37 @@ class TestUserSeeder extends Seeder
             'password' => Hash::make('password123'),
             'status' => 1,
         ]);
+
+        // Create Sadia employee
+        User::create([
+            'firstName' => 'Sadia',
+            'lastName' => 'Rahman',
+            'email' => 'sadia@test.com',
+            'phone' => '01712345678',
+            'password' => Hash::make('password123'),
+            'status' => 1,
+            'role_id' => 1,
+        ]);
+
+        // Create more test employees
+        User::create([
+            'firstName' => 'Ahmed',
+            'lastName' => 'Hassan',
+            'email' => 'ahmed@test.com',
+            'phone' => '01723456789',
+            'password' => Hash::make('password123'),
+            'status' => 1,
+            'role_id' => 1,
+        ]);
+
+        User::create([
+            'firstName' => 'Fatima',
+            'lastName' => 'Khan',
+            'email' => 'fatima@test.com',
+            'phone' => '01734567890',
+            'password' => Hash::make('password123'),
+            'status' => 1,
+            'role_id' => 1,
+        ]);
     }
 }
