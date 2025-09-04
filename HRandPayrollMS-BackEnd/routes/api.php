@@ -5,7 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Setting\GeneralSettingController;
 
 //Route
-Route::get('/generalsetting', [GeneralSettingController::class, 'setting']);
+Route::get('/generalsetting', [GeneralSettingController::class, 'index']);
+Route::post('/generalsetting', [GeneralSettingController::class, 'setting']);
 
 /*
 // General Settings Routes
