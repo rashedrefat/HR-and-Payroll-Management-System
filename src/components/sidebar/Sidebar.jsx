@@ -22,12 +22,12 @@ const Sidebar = () => {
       >
         <aside
           id="sidebar"
-          className={`w-[250px] h-screen bg-red-50 fixed top-0 ${
+          className={`w-[250px] h-screen bg-white fixed top-0 ${
             isSidebarOpen ? "translate-x-0" : "-translate-x-full"
           } transform transition-transform duration-300 ease-in-out lg:translate-x-0 z-50 shadow-xl flex flex-col`}
         >
           {/* Fixed Brand Section */}
-          <div className="px-8 py-0 hidden lg:flex items-center bg-red-50 flex-shrink-0 h-20">
+          <div className="px-8 py-0 hidden lg:flex items-center bg-white flex-shrink-0 h-20">
             <Brand />
           </div>
           

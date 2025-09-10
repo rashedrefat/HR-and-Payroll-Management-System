@@ -1,28 +1,78 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useLoginMutation } from "../../features/auth/authSlice";
 
 export default function EmployeeLogin() {
   const [formData, setFormData] = useState({
-    employeeId: "",
+    email: "",
     password: "",
   });
-  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [login, { isLoading }] = useLoginMutation();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Simple authentication logic (in a real app, this would be an API call)
-    if (formData.employeeId === "EMP-82382" && formData.password === "123456") {
-      localStorage.setItem("employee", JSON.stringify({
-        id: "EMP-82382",
-        name: "Rashedul Islam",
-        department: "Web Development",
-        designation: "Senior Web Developer"
-      }));
+    try {
+      console.log("Attempting employee login with:", { email: formData.email, password: formData.password });
+      
+      const response = await login({ 
+        email: formData.email, 
+        password: formData.password 
+      }).unwrap();
+      
+      console.log("Employee login response:", response);
+      
+      // Store user data and tokens
+      localStorage.setItem("user", JSON.stringify(response.user));
+      localStorage.setItem("access_token", response.access_token);
+      if (response.refresh_token) {
+        localStorage.setItem("refresh_token", response.refresh_token);
+      }
+      
+      // Determine user role from response
+      const userRole = response.user.role || (response.user.role_id === 2 ? "admin" : "employee");
+      localStorage.setItem("userRole", userRole);
+      
+      // Store employee data for employee components
+      localStorage.setItem("employee", JSON.stringify(response.user));
+      
+      toast.success("Login successful!", {
+        position: "top-right",
+        autoClose: 2000,
+      });
+      
+      // Always redirect to employee dashboard from employee login
       navigate("/employee/dashboard");
-    } else {
-      setError("Invalid employee ID or password");
+      
+    } catch (error) {
+      console.error("Employee login error:", error);
+      
+      // Handle validation errors
+      if (error?.data?.message) {
+        toast.error(error.data.message, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      } else if (error?.data?.errors) {
+        const firstError = Object.values(error.data.errors)[0][0];
+        toast.error(firstError, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      } else if (error?.message) {
+        toast.error(error.message, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      } else {
+        toast.error("Login failed. Please try again.", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      }
     }
   };
 
@@ -39,24 +89,19 @@ export default function EmployeeLogin() {
           <p className="text-gray-600 mt-1">Sign in to your account</p>
         </div>
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-            {error}
-          </div>
-        )}
-
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Employee ID
+              Email
             </label>
             <input
-              type="text"
-              value={formData.employeeId}
-              onChange={(e) => setFormData({...formData, employeeId: e.target.value})}
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
-              placeholder="Enter your employee ID"
+              placeholder="Enter your email"
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -64,21 +109,44 @@ export default function EmployeeLogin() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Password
             </label>
-            <input
-              type="password"
-              value={formData.password}
-              onChange={(e) => setFormData({...formData, password: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
-              placeholder="Enter your password"
-              required
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={formData.password}
+                onChange={(e) => setFormData({...formData, password: e.target.value})}
+                className="w-full px-3 py-2 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
+                placeholder="Enter your password"
+                required
+                disabled={isLoading}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                tabIndex={-1}
+                disabled={isLoading}
+              >
+                {showPassword ? "🙈" : "👁️"}
+              </button>
+            </div>
           </div>
 
           <button
             type="submit"
-            className="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors font-medium"
+            disabled={isLoading}
+            className="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Sign In
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Signing In...
+              </div>
+            ) : (
+              "Sign In"
+            )}
           </button>
         </form>
 
@@ -91,11 +159,15 @@ export default function EmployeeLogin() {
           </p>
         </div>
 
-        <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-          <p className="text-xs text-gray-600 text-center">
-            <strong>Demo Credentials:</strong><br />
-            Employee ID: EMP-001<br />
-            Password: password
+        <div className="mt-4 text-center">
+          <p className="text-sm text-gray-600">
+            Need admin access?{" "}
+            <button
+              onClick={() => navigate("/login")}
+              className="text-red-600 hover:text-red-700 font-medium"
+            >
+              Admin Login
+            </button>
           </p>
         </div>
       </div>

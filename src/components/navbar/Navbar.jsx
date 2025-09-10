@@ -1,25 +1,18 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { themeStatus, toggle } from "../../features/theme/themeSlice";
 import { toggle as drawerToggle } from "../../features/drawer/drawerSlice";
 import { useAuth } from "../hooks/useAuth";
 import Notification from "../notification/Notification";
 import Overlay from "../overlay/Overlay";
 import SearchBar from "./SearchBar";
-import Toggler from "./Toggler";
 import LoggedInUserInfoButton from "./LoggedInUserInfoButton";
 
 export default function Navbar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const currentTheme = useSelector(themeStatus);
   const [notificationPopup, setNotificationPopup] = useState(false);
-
-  function handleThemeToggle() {
-    dispatch(toggle());
-  }
 
   function closeNotificationPopup() {
     setNotificationPopup(false);
@@ -54,16 +47,6 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center space-x-3">
-            {/* Theme Toggle */}
-            <div className="hidden md:flex md:items-center bg-gray-50 backdrop-blur-sm rounded-xl px-3 py-2 border border-gray-200">
-              <Toggler
-                checked={Number(currentTheme) === 2}
-                handleChange={handleThemeToggle}
-                text="Light Mode"
-                className="text-gray-700 text-sm font-medium"
-              />
-            </div>
-
             {/* Notifications */}
             <div className="relative">
               <button
@@ -87,7 +70,7 @@ export default function Navbar() {
 
             {/* User Section */}
             {user ? (
-              <LoggedInUserInfoButton user={user} />
+              <LoggedInUserInfoButton />
             ) : (
               <button 
                 onClick={() => navigate("/signin")}
@@ -99,18 +82,6 @@ export default function Navbar() {
                 Sign In
               </button>
             )}
-          </div>
-        </div>
-
-        {/* Mobile theme toggle */}
-        <div className="md:hidden border-t border-gray-200 bg-gray-50 backdrop-blur-sm px-4 py-3 flex items-center">
-          <div className="bg-white backdrop-blur-sm rounded-xl px-3 py-2 border border-gray-200 shadow-sm">
-            <Toggler
-              checked={Number(currentTheme) === 2}
-              handleChange={handleThemeToggle}
-              text="Light Mode"
-              className="text-gray-700 text-sm font-medium"
-            />
           </div>
         </div>
       </nav>

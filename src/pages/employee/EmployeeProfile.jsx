@@ -1,19 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
+import { useCurrentUser } from "../../components/hooks/useCurrentUser";
+import { useCurrentAdminUser } from "../../components/hooks/useCurrentAdminUser";
+import { useAuth } from "../../components/hooks/useAuth";
 
 export default function EmployeeProfile() {
-  const [employeeData, setEmployeeData] = useState({
-    name: "Rashedul Islam",
-    employeeId: "EMP-82382",
-    email: "rashedul@smarthr.com",
-    phone: "+8801934478672",
-    department: "Web Development",
-    designation: "Senior Web Developer",
-    joinDate: "2023-01-15",
-    address: "Dhaka, Bangladesh",
-    emergencyContact: "+8801915620577",
-    bloodGroup: "O+",
-    dateOfBirth: "2000-09-14",
-  });
+  const { user } = useAuth();
+  const isAdmin = user?.role_id === 2;
+  
+  const currentEmployeeUser = useCurrentUser();
+  const currentAdminUser = useCurrentAdminUser();
+  
+  // Use the appropriate user data based on role
+  const currentUser = isAdmin ? currentAdminUser : currentEmployeeUser;
+  
+  const initialEmployeeData = useMemo(() => {
+    return {
+      name: currentUser.fullName,
+      employeeId: currentUser.empId,
+      email: currentUser.email,
+      phone: currentUser.phone,
+      department: currentUser.department,
+      designation: currentUser.designation,
+      joinDate: currentUser.joinDate,
+      address: currentUser.address,
+      emergencyContact: currentUser.emergencyContact,
+      bloodGroup: currentUser.bloodGroup,
+      dateOfBirth: currentUser.dateOfBirth,
+      profilePicture: currentUser.profilePicture,
+    };
+  }, [currentUser]);
+
+  const [employeeData, setEmployeeData] = useState(initialEmployeeData);
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -28,7 +45,9 @@ export default function EmployeeProfile() {
     <section className="px-6 py-8">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight font-inter">My Profile</h1>
+          <h1 className="text-3xl font-bold text-gray-900 tracking-tight font-inter">
+            {isAdmin ? 'Admin Profile' : 'My Profile'}
+          </h1>
           <p className="text-gray-600 mt-1">Manage your personal information and settings</p>
         </div>
         <div className="flex gap-4">
@@ -66,7 +85,7 @@ export default function EmployeeProfile() {
             <div className="text-center">
               <img
                 className="h-32 w-32 rounded-full object-cover mx-auto border-4 border-red-200"
-                src="/images/profile-photo.jpg"
+                src={employeeData.profilePicture}
                 alt={employeeData.name}
               />
               <h2 className="text-xl font-bold text-gray-900 mt-4">{employeeData.name}</h2>
@@ -103,7 +122,9 @@ export default function EmployeeProfile() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Employee ID</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {isAdmin ? 'Admin ID' : 'Employee ID'}
+                </label>
                 <p className="text-gray-900 py-2">{employeeData.employeeId}</p>
               </div>
 
@@ -136,17 +157,23 @@ export default function EmployeeProfile() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Department</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {isAdmin ? 'Role' : 'Department'}
+                </label>
                 <p className="text-gray-900 py-2">{employeeData.department}</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Designation</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {isAdmin ? 'Position' : 'Designation'}
+                </label>
                 <p className="text-gray-900 py-2">{employeeData.designation}</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Join Date</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {isAdmin ? 'Account Created' : 'Join Date'}
+                </label>
                 <p className="text-gray-900 py-2">{employeeData.joinDate}</p>
               </div>
 

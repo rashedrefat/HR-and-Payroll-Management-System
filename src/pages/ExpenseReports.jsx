@@ -4,6 +4,7 @@ import { useState } from "react";
 import ExpenseReportsRow from "../components/table/rows/ExpenseReportsRow";
 import IconButton from "../components/buttons/IconButton";
 import { useDebounce } from "../components/hooks/useDebounce";
+import { Receipt, DollarSign, CheckCircle, Clock } from "lucide-react";
 
 const tableLabels = [
   { title: "Employee", sort: true },
@@ -155,6 +156,7 @@ export default function ExpenseReports() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [departmentFilter, setDepartmentFilter] = useState("all");
   const [expenseTypeFilter, setExpenseTypeFilter] = useState("all");
+  const [showAddModal, setShowAddModal] = useState(false);
 
   // Debounce search term
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
@@ -268,6 +270,46 @@ export default function ExpenseReports() {
     setExpenseTypeFilter("all");
   };
 
+  // Function to handle adding new expense report
+  const handleSubmitExpenseReport = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    
+    const status = formData.get('status');
+    const providedApprovalDate = formData.get('approvalDate');
+    
+    // Auto-set approval date if status is approved/declined and no date provided
+    let approvalDate = providedApprovalDate || null;
+    if ((status === 'Approved' || status === 'Declined') && !approvalDate) {
+      approvalDate = new Date().toISOString().split('T')[0];
+    }
+    
+    const newExpense = {
+      id: expenseData.length + 1,
+      name: {
+        id: expenseData.length + 1,
+        title: formData.get('employeeName'),
+        image: "/images/profile-photo.jpg",
+        visibleCheckbox: true,
+      },
+      employeeId: formData.get('employeeId'),
+      department: formData.get('department'),
+      expenseType: formData.get('expenseType'),
+      amount: parseFloat(formData.get('amount')),
+      submittedDate: formData.get('submittedDate'),
+      approvalDate: approvalDate,
+      status: status,
+      description: formData.get('description'),
+      receiptAttached: formData.get('receipt') ? true : false,
+      approvedBy: status === 'Approved' ? "Manager" : null,
+      reimbursementStatus: status === 'Approved' ? "Pending" : "N/A",
+      currency: "BDT"
+    };
+
+    setExpenseData([...expenseData, newExpense]);
+    setShowAddModal(false);
+  };
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       {/* Header */}
@@ -291,50 +333,74 @@ export default function ExpenseReports() {
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-xl p-6 text-white hover:shadow-lg transition-all">
+        {/* Total Expenses */}
+        <div className="bg-white rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300 group">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-red-100 text-sm font-medium">Total Expenses</p>
-              <h3 className="text-2xl font-bold">{totalExpenses}</h3>
+              <div className="flex items-center mb-2">
+                <div className="p-2 bg-red-50 rounded-lg group-hover:bg-red-100 transition-colors">
+                  <Receipt className="w-6 h-6 text-red-600" />
+                </div>
+              </div>
+              <p className="text-sm font-medium text-gray-600">Total Expenses</p>
+              <h3 className="text-2xl font-bold text-gray-900 mt-1">{totalExpenses}</h3>
             </div>
-            <div className="bg-white bg-opacity-20 p-3 rounded-lg">
-              <img src="/icons/expense.svg" alt="Expenses" className="w-8 h-8 filter brightness-0 invert" />
+            <div className="text-red-500 text-sm font-medium bg-red-50 px-2 py-1 rounded-full">
+              +12%
             </div>
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white hover:shadow-lg transition-all">
+        {/* Total Amount */}
+        <div className="bg-white rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300 group">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-green-100 text-sm font-medium">Total Amount</p>
-              <h3 className="text-2xl font-bold">{formatCurrency(totalAmount)}</h3>
+              <div className="flex items-center mb-2">
+                <div className="p-2 bg-green-50 rounded-lg group-hover:bg-green-100 transition-colors">
+                  <DollarSign className="w-6 h-6 text-green-600" />
+                </div>
+              </div>
+              <p className="text-sm font-medium text-gray-600">Total Amount</p>
+              <h3 className="text-2xl font-bold text-gray-900 mt-1">{formatCurrency(totalAmount)}</h3>
             </div>
-            <div className="bg-white bg-opacity-20 p-3 rounded-lg">
-              <img src="/icons/money.svg" alt="Amount" className="w-8 h-8 filter brightness-0 invert" />
+            <div className="text-green-500 text-sm font-medium bg-green-50 px-2 py-1 rounded-full">
+              +8%
             </div>
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white hover:shadow-lg transition-all">
+        {/* Approved */}
+        <div className="bg-white rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300 group">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-blue-100 text-sm font-medium">Approved</p>
-              <h3 className="text-2xl font-bold">{approvedExpenses}</h3>
+              <div className="flex items-center mb-2">
+                <div className="p-2 bg-blue-50 rounded-lg group-hover:bg-blue-100 transition-colors">
+                  <CheckCircle className="w-6 h-6 text-blue-600" />
+                </div>
+              </div>
+              <p className="text-sm font-medium text-gray-600">Approved</p>
+              <h3 className="text-2xl font-bold text-gray-900 mt-1">{approvedExpenses}</h3>
             </div>
-            <div className="bg-white bg-opacity-20 p-3 rounded-lg">
-              <img src="/icons/present.svg" alt="Approved" className="w-8 h-8 filter brightness-0 invert" />
+            <div className="text-blue-500 text-sm font-medium bg-blue-50 px-2 py-1 rounded-full">
+              +15%
             </div>
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl p-6 text-white hover:shadow-lg transition-all">
+        {/* Pending */}
+        <div className="bg-white rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300 group">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-yellow-100 text-sm font-medium">Pending</p>
-              <h3 className="text-2xl font-bold">{pendingExpenses}</h3>
+              <div className="flex items-center mb-2">
+                <div className="p-2 bg-orange-50 rounded-lg group-hover:bg-orange-100 transition-colors">
+                  <Clock className="w-6 h-6 text-orange-600" />
+                </div>
+              </div>
+              <p className="text-sm font-medium text-gray-600">Pending</p>
+              <h3 className="text-2xl font-bold text-gray-900 mt-1">{pendingExpenses}</h3>
             </div>
-            <div className="bg-white bg-opacity-20 p-3 rounded-lg">
-              <img src="/icons/timeline.svg" alt="Pending" className="w-8 h-8 filter brightness-0 invert" />
+            <div className="text-orange-500 text-sm font-medium bg-orange-50 px-2 py-1 rounded-full">
+              -5%
             </div>
           </div>
         </div>
@@ -467,15 +533,19 @@ export default function ExpenseReports() {
         </div>
         <div className="flex items-center gap-3">
           <IconButton 
-            className="bg-green-600 hover:bg-green-700 text-white"
+            bg="bg-green-600 hover:bg-green-700"
+            color="text-white"
             icon="/icons/export.svg"
             text="Export Data"
           />
-          <IconButton 
-            className="bg-red-600 hover:bg-red-700 text-white"
-            icon="/icons/plus-Icon.svg"
-            text="Add New Expense"
-          />
+          <button onClick={() => setShowAddModal(true)}>
+            <IconButton 
+              bg="bg-red-600 hover:bg-red-700"
+              color="text-white"
+              icon="/icons/plus-Icon.svg"
+              text="Add New Expense"
+            />
+          </button>
         </div>
       </div>
 
@@ -517,6 +587,209 @@ export default function ExpenseReports() {
           </div>
         )}
       </div>
+
+      {/* Add Expense Report Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold text-gray-900">Add New Expense Report</h2>
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <form onSubmit={handleSubmitExpenseReport} className="space-y-6">
+              {/* Row 1: Employee Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Employee Name *
+                  </label>
+                  <input
+                    type="text"
+                    name="employeeName"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    placeholder="Enter employee name"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Employee ID *
+                  </label>
+                  <input
+                    type="text"
+                    name="employeeId"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    placeholder="Enter employee ID"
+                  />
+                </div>
+              </div>
+
+              {/* Row 2: Department and Expense Type */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Department *
+                  </label>
+                  <select
+                    name="department"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  >
+                    <option value="">Select Department</option>
+                    <option value="Web Development">Web Development</option>
+                    <option value="Human Resource">Human Resource</option>
+                    <option value="Sales">Sales</option>
+                    <option value="Customer Support">Customer Support</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Finance">Finance</option>
+                    <option value="Operations">Operations</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Expense Type *
+                  </label>
+                  <select
+                    name="expenseType"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  >
+                    <option value="">Select Expense Type</option>
+                    <option value="Travel">Travel</option>
+                    <option value="Meals">Meals</option>
+                    <option value="Office Supplies">Office Supplies</option>
+                    <option value="Equipment">Equipment</option>
+                    <option value="Training">Training</option>
+                    <option value="Software">Software</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Row 3: Amount and Date */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Amount (BDT) *
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    name="amount"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    placeholder="Enter amount"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Submitted Date *
+                  </label>
+                  <input
+                    type="date"
+                    name="submittedDate"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              {/* Row 4: Status and Approval Date */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Status *
+                  </label>
+                  <select
+                    name="status"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  >
+                    <option value="">Select Status</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Declined">Declined</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Approval Date
+                  </label>
+                  <input
+                    type="date"
+                    name="approvalDate"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Auto-set if status is approved/declined
+                  </p>
+                </div>
+              </div>
+
+              {/* Row 5: Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description *
+                </label>
+                <textarea
+                  name="description"
+                  required
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  placeholder="Enter expense description..."
+                />
+              </div>
+
+              {/* Row 6: Receipt */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Receipt Attachment
+                </label>
+                <input
+                  type="file"
+                  name="receipt"
+                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent file:mr-3 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-red-600 file:text-white hover:file:bg-red-700 file:cursor-pointer"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Supported formats: PDF, DOC, DOCX, JPG, JPEG, PNG
+                </p>
+              </div>
+
+              <div className="flex justify-end space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  Add Expense Report
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

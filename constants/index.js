@@ -23,7 +23,7 @@ export const adminLinks = [
     link: "leave",
   },
   {
-    title: "Attendance List",
+    title: "Attendance",
     icon: "/icons/attendance.svg",
     link: "attendance",
   },
@@ -33,7 +33,7 @@ export const adminLinks = [
     link: "notice",
   },
   {
-    title: "Expense List",
+    title: "Expense",
     icon: "/icons/expense.svg",
     link: "expense",
   },
@@ -42,9 +42,9 @@ export const adminLinks = [
     icon: "/icons/settings.svg",
     link: "settings",
     extend: [
-      { title: "Time and Attendance", link: "settings/time-attendance" },
-      { title: "Leave Settings", link: "settings/leave-settings" },
-      { title: "Employee Settings", link: "settings/employee-settings" },
+      { title: "Time and Attendance", link: "settings/time-attendance", icon: "/icons/attendance.svg" },
+      { title: "Leave Settings", link: "settings/leave-settings", icon: "/icons/leave.svg" },
+      { title: "Employee Settings", link: "settings/employee-settings", icon: "/icons/employee.svg" },
     ],
   },
   {
@@ -52,8 +52,8 @@ export const adminLinks = [
     icon: "/icons/payroll.svg",
     link: "payroll",
     extend: [
-      { title: "Salary", link: "payroll/salary-settings" },
-      { title: "Increment", link: "payroll/increment" },
+      { title: "Salary", link: "payroll/salary-settings", icon: "/icons/money.svg" },
+      { title: "Increment", link: "payroll/increment", icon: "/icons/moneybag.svg" },
     ],
   },
     {
@@ -67,11 +67,11 @@ export const adminLinks = [
     icon: "/icons/reports.svg",
     link: "reports",
     extend: [
-      { title: "Employee Reports", link: "reports/employee-reports" },
-      { title: "Attendance Reports", link: "reports/attendance-reports" },
-      { title: "Leave Reports", link: "reports/leave-reports" },
-      { title: "Payroll Reports", link: "reports/payroll-reports" },
-      { title: "Expense Reports", link: "reports/expense-reports" },
+      { title: "Employee Reports", link: "reports/employee-reports", icon: "/icons/employees.svg" },
+      { title: "Attendance Reports", link: "reports/attendance-reports", icon: "/icons/present.svg" },
+      { title: "Leave Reports", link: "reports/leave-reports", icon: "/icons/bed.svg" },
+      { title: "Payroll Reports", link: "reports/payroll-reports", icon: "/icons/money.svg" },
+      { title: "Expense Reports", link: "reports/expense-reports", icon: "/icons/expense.svg" },
     ],
   },
 

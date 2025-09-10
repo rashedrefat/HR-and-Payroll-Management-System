@@ -1,15 +1,21 @@
-import React from "react";
+import React, { useMemo } from "react";
+import { useCurrentUser } from "../../components/hooks/useCurrentUser";
 
 export default function EmployeeDashboard() {
-  const employeeData = {
-    name: "Rashedul Islam",
-    employeeId: "EMP-82382",
-    department: "Web Development",
-    designation: "Senior Web Developer",
-    email: "rashedul@smarthr.com",
-    phone: "+8801934478672",
-    joinDate: "2023-01-15",
-  };
+  const currentUser = useCurrentUser();
+  
+  const employeeData = useMemo(() => {
+    return {
+      name: currentUser.fullName,
+      employeeId: currentUser.empId,
+      department: currentUser.department,
+      designation: currentUser.designation,
+      email: currentUser.email,
+      phone: currentUser.phone,
+      joinDate: currentUser.joinDate,
+      profilePicture: currentUser.profilePicture,
+    };
+  }, [currentUser]);
 
   return (
     <section className="px-6 py-8">
@@ -23,7 +29,7 @@ export default function EmployeeDashboard() {
         <div className="flex items-center space-x-4">
           <img
             className="h-20 w-20 rounded-full object-cover border-4 border-red-200"
-            src="/images/profile-photo.jpg"
+            src={employeeData.profilePicture}
             alt={employeeData.name}
           />
           <div>

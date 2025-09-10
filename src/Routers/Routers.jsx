@@ -13,7 +13,7 @@ import Login from "../pages/Login/Login";
 import Registration from "../pages/Registration/Registration";
 import Dashboard from "../pages/Dashboard";
 import Company from "../pages/Company/Company";
-import Allemployee from "../pages/AllEmployee";
+import Allemployee from "../pages/Allemployee";
 import LeaveApplication from "../pages/LeaveApplication";
 import AttendanceList from "../pages/AttendanceList";
 import OfficeNotice from "../pages/OfficeNotice";
@@ -31,9 +31,9 @@ import AttendanceReport from "../pages/AttendanceReport";
 import LeaveReport from "../pages/LeaveReport";
 import PayrollReport from "../pages/PayrollReport";
 import ExpenseReports from "../pages/ExpenseReports";
+import Reports from "../pages/Reports";
 
 // Employee Portal Pages
-import EmployeeLogin from "../pages/employee/EmployeeLogin";
 import EmployeeDashboard from "../pages/employee/EmployeeDashboard";
 import EmployeeProfile from "../pages/employee/EmployeeProfile";
 import EmployeePayslips from "../pages/employee/EmployeePayslips";
@@ -82,17 +82,18 @@ export default function Routers() {
           <Route path="increment" element={<Increment />} />
         </Route>
         <Route path="reports">
+          <Route index element={<Reports />} />
           <Route path="employee-reports" element={<EmployeeReport />} />
           <Route path="attendance-reports" element={<AttendanceReport />} />
           <Route path="leave-reports" element={<LeaveReport />} />
           <Route path="payroll-reports" element={<PayrollReport />} />
           <Route path="expense-reports" element={<ExpenseReports />} />
         </Route>
+        <Route path="profile" element={<EmployeeProfile />} />
       </Route>
 
       {/* Employee Portal Routes */}
       <Route path="employee">
-        <Route path="login" element={<EmployeeLogin />} />
         <Route element={<EmployeeLayout />}>
           <Route path="dashboard" element={<EmployeeDashboard />} />
           <Route path="profile" element={<EmployeeProfile />} />

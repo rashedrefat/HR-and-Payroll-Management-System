@@ -4,6 +4,7 @@ import { useDebounce } from "../components/hooks/useDebounce";
 import Table from "../components/table/Table";
 import EmployeeReportRow from "../components/table/rows/EmployeeReportRow";
 import IconButton from "../components/buttons/IconButton";
+import { Users, UserCheck, UserX, TrendingUp } from "lucide-react";
 
 // Table headers for employee report
 const tableLabels = [
@@ -273,59 +274,83 @@ const EmployeeReport = () => {
           <IconButton
             text="Export Report"
             color="text-white"
-            bg="bg-red-600"
+            bg="bg-green-600"
             icon="/icons/export.svg"
-            className="hover:bg-red-700"
+            className="hover:bg-green-700"
           />
         </div>
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white transform transition-all duration-300 hover:scale-105 hover:shadow-xl hover:from-blue-600 hover:to-blue-700 cursor-pointer">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        {/* Total Employees */}
+        <div className="bg-white rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300 group">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-blue-100 text-sm font-medium">Total Employees</p>
-              <p className="text-3xl font-bold mt-2">{stats.total}</p>
+              <div className="flex items-center mb-2">
+                <div className="p-2 bg-blue-50 rounded-lg group-hover:bg-blue-100 transition-colors">
+                  <Users className="w-6 h-6 text-blue-600" />
+                </div>
+              </div>
+              <p className="text-sm font-medium text-gray-600">Total Employees</p>
+              <h3 className="text-2xl font-bold text-gray-900 mt-1">{stats.total}</h3>
             </div>
-            <div className="bg-blue-800 bg-opacity-80 rounded-full p-4 transition-all duration-300 hover:bg-opacity-100 hover:scale-110 flex items-center justify-center">
-              <img src="/icons/employees.svg" alt="Total Employees" className="w-8 h-8 filter brightness-0 invert" />
+            <div className="text-blue-500 text-sm font-medium bg-blue-50 px-2 py-1 rounded-full">
+              +5%
             </div>
           </div>
         </div>
 
-        <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-white transform transition-all duration-300 hover:scale-105 hover:shadow-xl hover:from-green-600 hover:to-green-700 cursor-pointer">
+        {/* Active Employees */}
+        <div className="bg-white rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300 group">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-green-100 text-sm font-medium">Active Employees</p>
-              <p className="text-3xl font-bold mt-2">{stats.active}</p>
+              <div className="flex items-center mb-2">
+                <div className="p-2 bg-green-50 rounded-lg group-hover:bg-green-100 transition-colors">
+                  <UserCheck className="w-6 h-6 text-green-600" />
+                </div>
+              </div>
+              <p className="text-sm font-medium text-gray-600">Active Employees</p>
+              <h3 className="text-2xl font-bold text-gray-900 mt-1">{stats.active}</h3>
             </div>
-            <div className="bg-green-800 bg-opacity-80 rounded-full p-4 transition-all duration-300 hover:bg-opacity-100 hover:scale-110 flex items-center justify-center">
-              <img src="/icons/present.svg" alt="Active Employees" className="w-8 h-8 filter brightness-0 invert" />
+            <div className="text-green-500 text-sm font-medium bg-green-50 px-2 py-1 rounded-full">
+              +8%
             </div>
           </div>
         </div>
 
-        <div className="bg-gradient-to-r from-red-500 to-red-600 rounded-xl p-6 text-white transform transition-all duration-300 hover:scale-105 hover:shadow-xl hover:from-red-600 hover:to-red-700 cursor-pointer">
+        {/* Inactive Employees */}
+        <div className="bg-white rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300 group">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-red-100 text-sm font-medium">Inactive Employees</p>
-              <p className="text-3xl font-bold mt-2">{stats.inactive}</p>
+              <div className="flex items-center mb-2">
+                <div className="p-2 bg-red-50 rounded-lg group-hover:bg-red-100 transition-colors">
+                  <UserX className="w-6 h-6 text-red-600" />
+                </div>
+              </div>
+              <p className="text-sm font-medium text-gray-600">Inactive Employees</p>
+              <h3 className="text-2xl font-bold text-gray-900 mt-1">{stats.inactive}</h3>
             </div>
-            <div className="bg-red-800 bg-opacity-80 rounded-full p-4 transition-all duration-300 hover:bg-opacity-100 hover:scale-110 flex items-center justify-center">
-              <img src="/icons/cross.svg" alt="Inactive Employees" className="w-6 h-auto filter brightness-0 invert" />
+            <div className="text-red-500 text-sm font-medium bg-red-50 px-2 py-1 rounded-full">
+              -2%
             </div>
           </div>
         </div>
 
-        <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-6 text-white transform transition-all duration-300 hover:scale-105 hover:shadow-xl hover:from-purple-600 hover:to-purple-700 cursor-pointer">
+        {/* Average Performance */}
+        <div className="bg-white rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300 group">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-purple-100 text-sm font-medium">Avg Performance</p>
-              <p className="text-3xl font-bold mt-2">{stats.averagePerformance}%</p>
+              <div className="flex items-center mb-2">
+                <div className="p-2 bg-purple-50 rounded-lg group-hover:bg-purple-100 transition-colors">
+                  <TrendingUp className="w-6 h-6 text-purple-600" />
+                </div>
+              </div>
+              <p className="text-sm font-medium text-gray-600">Avg Performance</p>
+              <h3 className="text-2xl font-bold text-gray-900 mt-1">{stats.averagePerformance}%</h3>
             </div>
-            <div className="bg-purple-800 bg-opacity-80 rounded-full p-4 transition-all duration-300 hover:bg-opacity-100 hover:scale-110 flex items-center justify-center">
-              <img src="/icons/reports.svg" alt="Performance" className="w-8 h-8 filter brightness-0 invert" />
+            <div className="text-purple-500 text-sm font-medium bg-purple-50 px-2 py-1 rounded-full">
+              +3%
             </div>
           </div>
         </div>

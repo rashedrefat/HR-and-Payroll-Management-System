@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import Table from "../components/table/Table";
 import { useState } from "react";
 import AllEmployeeRow from "../components/table/rows/AllEmployeeRow";
@@ -116,6 +115,18 @@ export default function AllEmployee() {
   const [statusFilter, setStatusFilter] = useState("All");
   const [departmentFilter, setDepartmentFilter] = useState("All");
   const [showBulkActions, setShowBulkActions] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newEmployee, setNewEmployee] = useState({
+    name: '',
+    email: '',
+    employeeId: '',
+    mobile: '',
+    department: '',
+    designation: '',
+    joiningDate: '',
+    status: 'Active',
+    profilePicture: null
+  });
 
   const resetSelection = () => {
     setSelect([]);
@@ -137,6 +148,27 @@ export default function AllEmployee() {
       prevData.map(employee => 
         ids.includes(employee.id) ? { ...employee, status: newStatus } : employee
       )
+    );
+  };
+
+  // Handler functions for edit and delete actions
+  const handleEmployeeEdit = (employeeData) => {
+    console.log('Edit employee:', employeeData);
+    // Show a temporary alert to demonstrate the edit functionality is working
+    alert(`Edit functionality triggered for: ${employeeData.name.title}\nEmployee ID: ${employeeData.employeeId}\nDepartment: ${employeeData.department}`);
+    // TODO: Replace this alert with your edit modal or form
+  };
+
+  const handleEmployeeDelete = (employeeData) => {
+    console.log('Delete employee:', employeeData);
+    // Remove employee from the table data
+    setTableData(prevData => 
+      prevData.filter(employee => employee.id !== employeeData.id)
+    );
+    
+    // Also remove from selection if selected
+    setSelect(prevSelection => 
+      prevSelection.filter(selectedId => selectedId !== employeeData.id)
     );
   };
 
@@ -173,6 +205,72 @@ export default function AllEmployee() {
 
     return matchesSearch && matchesStatus && matchesDepartment;
   });
+
+  // Modal functions
+  const handleAddEmployee = () => {
+    setShowAddModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowAddModal(false);
+    setNewEmployee({
+      name: '',
+      email: '',
+      employeeId: '',
+      mobile: '',
+      department: '',
+      designation: '',
+      joiningDate: '',
+      status: 'Active',
+      profilePicture: null
+    });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewEmployee(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setNewEmployee(prev => ({
+      ...prev,
+      profilePicture: file
+    }));
+  };
+
+  const handleSubmitEmployee = (e) => {
+    e.preventDefault();
+    
+    // Generate new employee ID
+    const newId = Math.max(...tableData.map(emp => emp.id)) + 1;
+    
+    // Create new employee object
+    const employeeToAdd = {
+      id: newId,
+      name: {
+        title: newEmployee.name,
+        image: newEmployee.profilePicture ? URL.createObjectURL(newEmployee.profilePicture) : "/images/profile-photo.jpg",
+        visibleCheckbox: true,
+      },
+      email: newEmployee.email,
+      employeeId: newEmployee.employeeId,
+      mobile: newEmployee.mobile,
+      department: newEmployee.department,
+      designation: newEmployee.designation,
+      joiningDate: newEmployee.joiningDate,
+      status: newEmployee.status,
+    };
+    
+    // Add to table data
+    setTableData(prev => [...prev, employeeToAdd]);
+    
+    // Close modal and reset form
+    handleCloseModal();
+  };
 
   const selectAll = (e) => {
     if (e.target.checked) {
@@ -234,7 +332,7 @@ export default function AllEmployee() {
               />
             </div>
           </div>
-          <Link to="/employee/add">
+          <button onClick={handleAddEmployee}>
             <IconButton
               text="Add Employee"
               color="text-white"
@@ -242,7 +340,7 @@ export default function AllEmployee() {
               icon="/icons/plus-Icon.svg"
               className="hover:bg-red-700"
             />
-          </Link>
+          </button>
         </div>
       </div>
 
@@ -406,10 +504,212 @@ export default function AllEmployee() {
               selectedData={select}
               selectRow={handleSelect}
               updateEmployeeStatus={updateEmployeeStatus}
+              onEdit={handleEmployeeEdit}
+              onDelete={handleEmployeeDelete}
             />
           ))}
         </Table>
       </div>
+
+      {/* Add Employee Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full m-4 max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Add New Employee</h2>
+                <button
+                  onClick={handleCloseModal}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmitEmployee} className="space-y-6">
+                {/* Row 1: Personal Information */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Full Name */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Full Name *
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={newEmployee.name}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      placeholder="Enter full name"
+                    />
+                  </div>
+
+                  {/* Employee ID */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Employee ID *
+                    </label>
+                    <input
+                      type="text"
+                      name="employeeId"
+                      value={newEmployee.employeeId}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      placeholder="Enter employee ID (e.g., EMP-12345)"
+                    />
+                  </div>
+                </div>
+
+                {/* Row 2: Contact Information */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Email */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Email Address *
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={newEmployee.email}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      placeholder="Enter email address"
+                    />
+                  </div>
+
+                  {/* Mobile */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Mobile Number *
+                    </label>
+                    <input
+                      type="tel"
+                      name="mobile"
+                      value={newEmployee.mobile}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      placeholder="Enter mobile number"
+                    />
+                  </div>
+                </div>
+
+                {/* Row 3: Work Information */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Department */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Department *
+                    </label>
+                    <select
+                      name="department"
+                      value={newEmployee.department}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    >
+                      <option value="">Select Department</option>
+                      <option value="Web Development">Web Development</option>
+                      <option value="Human Resource">Human Resource</option>
+                      <option value="Sales">Sales</option>
+                      <option value="Customer Support">Customer Support</option>
+                      <option value="Marketing">Marketing</option>
+                      <option value="Finance">Finance</option>
+                    </select>
+                  </div>
+
+                  {/* Designation */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Designation *
+                    </label>
+                    <input
+                      type="text"
+                      name="designation"
+                      value={newEmployee.designation}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      placeholder="Enter designation"
+                    />
+                  </div>
+                </div>
+
+                {/* Row 4: Employment Details */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Joining Date */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Joining Date *
+                    </label>
+                    <input
+                      type="date"
+                      name="joiningDate"
+                      value={newEmployee.joiningDate}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  {/* Status */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Status *
+                    </label>
+                    <select
+                      name="status"
+                      value={newEmployee.status}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    >
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Profile Picture */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Profile Picture
+                  </label>
+                  <input
+                    type="file"
+                    name="profilePicture"
+                    onChange={handleFileChange}
+                    accept="image/*"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent file:mr-3 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-red-600 file:text-white hover:file:bg-red-700 file:cursor-pointer"
+                  />
+                  <p className="text-sm text-gray-500 mt-1">Upload a profile picture (optional)</p>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex justify-end space-x-3 pt-6">
+                  <button
+                    type="button"
+                    onClick={handleCloseModal}
+                    className="px-6 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                  >
+                    Add Employee
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

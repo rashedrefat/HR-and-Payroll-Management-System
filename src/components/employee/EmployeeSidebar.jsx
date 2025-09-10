@@ -1,8 +1,11 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
+import PortalPageButton from "../sidebar/PortalPageButton";
+import { useCurrentUser } from "../hooks/useCurrentUser";
 
 export default function EmployeeSidebar() {
   const location = useLocation();
+  const currentUser = useCurrentUser();
 
   const menuItems = [
     {
@@ -44,20 +47,25 @@ export default function EmployeeSidebar() {
   return (
     <aside className="fixed left-0 top-20 h-[calc(100vh-5rem)] w-64 bg-white shadow-lg border-r border-gray-200 overflow-y-auto z-40">
       <div className="p-4">
+        {/* Portal Switcher Button */}
+        <div className="mb-4">
+          <PortalPageButton />
+        </div>
+        
         {/* Employee Info */}
         <div className="bg-gradient-to-r from-red-50 to-red-100 rounded-lg p-4 mb-6">
           <div className="flex items-center space-x-3">
             <img
               className="h-12 w-12 rounded-full object-cover border-2 border-red-200"
-              src="/images/profile-photo.jpg"
-              alt="Profile"
+              src={currentUser.profilePicture}
+              alt={currentUser.fullName}
             />
             <div>
               <h3 className="text-sm font-semibold text-gray-900">
-                {JSON.parse(localStorage.getItem("employee") || "{}")?.name || "Rashedul Islam"}
+                {currentUser.fullName}
               </h3>
               <p className="text-xs text-gray-600">
-                ID: EMP-82382
+                ID: {currentUser.employeeId}
               </p>
             </div>
           </div>
@@ -104,17 +112,6 @@ export default function EmployeeSidebar() {
               <span className="font-semibold text-yellow-600">1</span>
             </div>
           </div>
-        </div>
-
-        {/* Help Section */}
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-          <h4 className="text-sm font-semibold text-blue-900 mb-2">Need Help?</h4>
-          <p className="text-xs text-blue-700 mb-3">
-            Contact IT support for any technical issues
-          </p>
-          <button className="w-full px-3 py-2 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors">
-            Contact Support
-          </button>
         </div>
       </div>
     </aside>

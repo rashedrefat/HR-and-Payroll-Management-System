@@ -1,71 +1,71 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useLoginMutation } from "../../features/auth/authSlice";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [loginType, setLoginType] = useState("admin"); // New state for login type
+  const [login, { isLoading }] = useLoginMutation();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     
     try {
-      // Simulate API call - replace with actual authentication logic
-      setTimeout(() => {
-        // Mock user data based on login type - replace with actual API response
-        const mockUser = loginType === "admin" ? {
-          id: 1,
-          firstName: "Admin",
-          lastName: "User",
-          email: email,
-          profilePicture: null,
-          role: "admin",
-          employeeId: "ADM-001"
-        } : {
-          id: 2,
-          firstName: "John",
-          lastName: "Employee",
-          email: email,
-          profilePicture: null,
-          role: "employee",
-          employeeId: "EMP-001"
-        };
-        
-        // Store user data
-        localStorage.setItem("user", JSON.stringify(mockUser));
-        localStorage.setItem("access_token", "mock_token_" + Date.now());
-        localStorage.setItem("userRole", loginType);
-        
-        // For employee login, also store in employee key for employee components
-        if (loginType === "employee") {
-          localStorage.setItem("employee", JSON.stringify(mockUser));
-        }
-        
-        toast.success(`Login successful as ${loginType}!`, {
-          position: "top-right",
-          autoClose: 2000,
-        });
-        
-        // Redirect based on role
-        if (loginType === "admin") {
-          navigate("/dashboard");
-        } else {
-          navigate("/employee/dashboard");
-        }
-        setIsLoading(false);
-      }, 1000);
+      console.log("Attempting login with:", { email, password });
+      
+      const response = await login({ email, password }).unwrap();
+      console.log("Login response:", response);
+      
+      // Store user data and tokens
+      localStorage.setItem("user", JSON.stringify(response.user));
+      localStorage.setItem("access_token", response.access_token);
+      if (response.refresh_token) {
+        localStorage.setItem("refresh_token", response.refresh_token);
+      }
+      
+      // Determine user role from response or user data
+      const userRole = response.user.role || (response.user.role_id === 2 ? "admin" : "employee");
+      localStorage.setItem("userRole", userRole);
+      
+      // For employee login, also store in employee key for employee components
+      if (userRole === "employee") {
+        localStorage.setItem("employee", JSON.stringify(response.user));
+      }
+      
+      toast.success(`Login successful as ${userRole}!`, {
+        position: "top-right",
+        autoClose: 2000,
+      });
+      
+      // Redirect based on role
+      if (userRole === "admin") {
+        navigate("/dashboard");
+      } else {
+        navigate("/employee/dashboard");
+      }
     } catch (error) {
       console.error("Login error:", error);
-      toast.error("Login failed. Please try again.", {
-        position: "top-right",
-        autoClose: 3000,
-      });
-      setIsLoading(false);
+      
+      // Handle validation errors
+      if (error?.data?.message) {
+        toast.error(error.data.message, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      } else if (error?.message) {
+        toast.error(error.message, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      } else {
+        toast.error("Login failed. Please try again.", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      }
     }
   };
 
@@ -115,61 +115,21 @@ const Login = () => {
             </div>
           </div>
           <h2 className="text-3xl font-bold text-gray-800">Welcome Back</h2>
-          <p className="text-gray-600 mt-2">Sign in to your HR dashboard</p>
+          <p className="text-gray-600 mt-2">Sign in to access your dashboard</p>
+          <p className="text-xs text-gray-500 mt-1">Automatically redirects to admin or employee portal based on your account</p>
         </div>
 
-        {/* Login Type Selection */}
-        <div className="space-y-3">
-          <label className="text-sm font-medium text-gray-700 block">Login as</label>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => setLoginType("admin")}
-              className={`p-3 rounded-lg text-sm font-medium transition-all border-2 ${
-                loginType === "admin"
-                  ? "bg-red-50 border-red-500 text-red-700"
-                  : "bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100"
-              }`}
-              disabled={isLoading}
-            >
-              <div className="flex flex-col items-center space-y-1">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-                <span>Admin/HR</span>
-              </div>
-            </button>
-            <button
-              type="button"
-              onClick={() => setLoginType("employee")}
-              className={`p-3 rounded-lg text-sm font-medium transition-all border-2 ${
-                loginType === "employee"
-                  ? "bg-red-50 border-red-500 text-red-700"
-                  : "bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100"
-              }`}
-              disabled={isLoading}
-            >
-              <div className="flex flex-col items-center space-y-1">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                <span>Employee</span>
-              </div>
-            </button>
-          </div>
-        </div>
-        
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700 block">
-            {loginType === "admin" ? "Email" : "Employee ID or Email"}
+            Email
           </label>
           <div className="relative">
             <input
-              type={loginType === "admin" ? "email" : "text"}
+              type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              placeholder={loginType === "admin" ? "Enter your email" : "Enter your employee ID or email"}
+              placeholder="Enter your email"
               className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all text-sm"
               disabled={isLoading}
             />
@@ -203,11 +163,7 @@ const Login = () => {
         <button
           type="submit"
           disabled={isLoading}
-          className={`w-full py-3 px-4 rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
-            loginType === "admin"
-              ? "bg-gradient-to-r from-red-600 to-red-500 text-white hover:from-red-700 hover:to-red-600 focus:ring-red-500"
-              : "bg-gradient-to-r from-red-600 to-red-500 text-white hover:from-red-700 hover:to-red-600 focus:ring-red-500"
-          }`}
+          className="w-full py-3 px-4 rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-red-600 to-red-500 text-white hover:from-red-700 hover:to-red-600 focus:ring-red-500"
         >
           {isLoading ? (
             <div className="flex items-center justify-center">
@@ -218,7 +174,7 @@ const Login = () => {
               Signing In...
             </div>
           ) : (
-            `Sign In as ${loginType === "admin" ? "Admin" : "Employee"}`
+            "Sign In"
           )}
         </button>
 
@@ -229,20 +185,6 @@ const Login = () => {
               Sign Up
             </Link>
           </p>
-          <div className="text-xs text-gray-500 bg-gray-50 rounded-lg p-3">
-            <p className="font-medium mb-1">Demo Credentials:</p>
-            {loginType === "admin" ? (
-              <>
-                <p>Email: admin@example.com</p>
-                <p>Password: password</p>
-              </>
-            ) : (
-              <>
-                <p>Employee ID: EMP-001</p>
-                <p>Password: password</p>
-              </>
-            )}
-          </div>
         </div>
       </form>
     </div>

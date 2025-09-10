@@ -112,6 +112,7 @@ export default function OfficeNotice() {
   const [statusFilter, setStatusFilter] = useState("All");
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [showBulkActions, setShowBulkActions] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
 
   // Filter table data based on search term, priority, status, and category
   const filteredData = tableData.filter((notice) => {
@@ -158,6 +159,27 @@ export default function OfficeNotice() {
         ids.includes(notice.id) ? { ...notice, status: newStatus } : notice
       )
     );
+  };
+
+  // Function to handle adding new notice
+  const handleSubmitNotice = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    
+    const newNotice = {
+      id: tableData.length + 1,
+      serial: String(tableData.length + 1).padStart(2, '0'),
+      title: formData.get('title'),
+      noticeDescription: formData.get('description'),
+      attachment: formData.get('attachment')?.name || 'no-attachment.png',
+      date: formData.get('date'),
+      priority: formData.get('priority'),
+      status: 'Active',
+      category: formData.get('category'),
+    };
+
+    setTableData([...tableData, newNotice]);
+    setShowAddModal(false);
   };
 
   const handleSelect = (item, e) => {
@@ -231,7 +253,7 @@ export default function OfficeNotice() {
               />
             </div>
           </div>
-          <Link to="/notice/add">
+          <button onClick={() => setShowAddModal(true)}>
             <IconButton
               text="Add Notice"
               color="text-white"
@@ -239,7 +261,7 @@ export default function OfficeNotice() {
               icon="/icons/plus-Icon.svg"
               className="hover:bg-red-700"
             />
-          </Link>
+          </button>
         </div>
       </div>
 
@@ -437,6 +459,141 @@ export default function OfficeNotice() {
           ))}
         </Table>
       </div>
+
+      {/* Add Notice Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold text-gray-900">Add New Notice</h2>
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <form onSubmit={handleSubmitNotice} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+                    Notice Title *
+                  </label>
+                  <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter notice title"
+                  />
+                </div>
+                
+                <div>
+                  <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">
+                    Date *
+                  </label>
+                  <input
+                    type="date"
+                    id="date"
+                    name="date"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-1">
+                    Priority *
+                  </label>
+                  <select
+                    id="priority"
+                    name="priority"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select Priority</option>
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+                    Category *
+                  </label>
+                  <select
+                    id="category"
+                    name="category"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select Category</option>
+                    <option value="General">General</option>
+                    <option value="Holiday">Holiday</option>
+                    <option value="Meeting">Meeting</option>
+                    <option value="Event">Event</option>
+                    <option value="Policy">Policy</option>
+                    <option value="Security">Security</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+                  Notice Description *
+                </label>
+                <textarea
+                  id="description"
+                  name="description"
+                  required
+                  rows={6}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter detailed notice description..."
+                />
+              </div>
+
+              <div>
+                <label htmlFor="attachment" className="block text-sm font-medium text-gray-700 mb-1">
+                  Attachment
+                </label>
+                <input
+                  type="file"
+                  id="attachment"
+                  name="attachment"
+                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 file:mr-3 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-red-600 file:text-white hover:file:bg-red-700 file:cursor-pointer"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Supported formats: PDF, DOC, DOCX, JPG, JPEG, PNG
+                </p>
+              </div>
+
+              <div className="flex justify-end space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  Add Notice
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

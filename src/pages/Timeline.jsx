@@ -187,6 +187,7 @@ export default function Timeline() {
   const [departmentFilter, setDepartmentFilter] = useState("All");
   const [dateFilter, setDateFilter] = useState("2025-08-26");
   const [showBulkActions, setShowBulkActions] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
 
   const resetSelection = () => {
     setSelect([]);
@@ -257,6 +258,46 @@ export default function Timeline() {
     resetSelection();
   };
 
+  // Function to handle adding new timeline entry
+  const handleSubmitTimelineEntry = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    
+    // Calculate total hours
+    const timeIn = formData.get('timeIn');
+    const timeOut = formData.get('timeOut');
+    let totalHours = "0h 00m";
+    
+    if (timeIn && timeOut) {
+      const inTime = new Date(`2000-01-01 ${timeIn}`);
+      const outTime = new Date(`2000-01-01 ${timeOut}`);
+      const diffMs = outTime - inTime;
+      const hours = Math.floor(diffMs / (1000 * 60 * 60));
+      const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+      totalHours = `${hours}h ${minutes.toString().padStart(2, '0')}m`;
+    }
+
+    const newEntry = {
+      id: timelineData.length + 1,
+      employee: {
+        name: formData.get('employeeName'),
+        employeeId: formData.get('employeeId'),
+        designation: formData.get('designation'),
+        image: "/images/profile-photo.jpg"
+      },
+      department: formData.get('department'),
+      timeIn: formData.get('timeIn'),
+      timeOut: formData.get('timeOut') || "--",
+      totalHours: totalHours,
+      status: formData.get('status'),
+      location: formData.get('location'),
+      date: formData.get('date'),
+    };
+
+    setTimelineData([...timelineData, newEntry]);
+    setShowAddModal(false);
+  };
+
   const handleBulkDelete = () => {
     if (window.confirm(`Are you sure you want to delete ${select.length} selected records?`)) {
       setTimelineData(prevData => prevData.filter(record => !select.includes(record.id)));
@@ -293,7 +334,7 @@ export default function Timeline() {
             <img src="/icons/export.svg" alt="Export" className="h-4 w-4" />
             <span>Export Data</span>
           </button>
-          <Link to="/timeline/add">
+          <button onClick={() => setShowAddModal(true)}>
             <IconButton
               text="Add Entry"
               color="text-white"
@@ -301,7 +342,7 @@ export default function Timeline() {
               icon="/icons/plus-Icon.svg"
               className="hover:bg-red-700"
             />
-          </Link>
+          </button>
         </div>
       </div>
 
@@ -483,6 +524,181 @@ export default function Timeline() {
           </Table>
         </div>
       </div>
+
+      {/* Add Timeline Entry Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold text-gray-900">Add New Timeline Entry</h2>
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <form onSubmit={handleSubmitTimelineEntry} className="space-y-6">
+              {/* Row 1: Employee Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Employee Name *
+                  </label>
+                  <input
+                    type="text"
+                    name="employeeName"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    placeholder="Enter employee name"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Employee ID *
+                  </label>
+                  <input
+                    type="text"
+                    name="employeeId"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    placeholder="Enter employee ID"
+                  />
+                </div>
+              </div>
+
+              {/* Row 2: Department and Designation */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Department *
+                  </label>
+                  <select
+                    name="department"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  >
+                    <option value="">Select Department</option>
+                    <option value="Web Development">Web Development</option>
+                    <option value="Human Resource">Human Resource</option>
+                    <option value="Sales">Sales</option>
+                    <option value="Customer Support">Customer Support</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Finance">Finance</option>
+                    <option value="Operations">Operations</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Designation *
+                  </label>
+                  <input
+                    type="text"
+                    name="designation"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    placeholder="Enter designation"
+                  />
+                </div>
+              </div>
+
+              {/* Row 3: Time Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Time In *
+                  </label>
+                  <input
+                    type="time"
+                    name="timeIn"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Time Out
+                  </label>
+                  <input
+                    type="time"
+                    name="timeOut"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              {/* Row 4: Status and Location */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Status *
+                  </label>
+                  <select
+                    name="status"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  >
+                    <option value="">Select Status</option>
+                    <option value="Present">Present</option>
+                    <option value="Late">Late</option>
+                    <option value="Absent">Absent</option>
+                    <option value="Half Day">Half Day</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Location *
+                  </label>
+                  <input
+                    type="text"
+                    name="location"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    placeholder="Enter location (e.g., Office - Floor 3)"
+                  />
+                </div>
+              </div>
+
+              {/* Row 5: Date */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Date *
+                </label>
+                <input
+                  type="date"
+                  name="date"
+                  required
+                  defaultValue="2025-08-26"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                />
+              </div>
+
+              <div className="flex justify-end space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  Add Entry
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

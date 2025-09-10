@@ -114,11 +114,12 @@ const initialExpenseData = [
 ];
 
 export default function ExpenseList() {
-  const [expenseData] = useState(initialExpenseData);
+  const [expenseData, setExpenseData] = useState(initialExpenseData);
   const [filteredData, setFilteredData] = useState(initialExpenseData);
   const [selectedData, setSelectedData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [entriesPerPage, setEntriesPerPage] = useState(10);
+  const [showAddModal, setShowAddModal] = useState(false);
 
   // Filter data based on search term
   useEffect(() => {
@@ -146,6 +147,29 @@ export default function ExpenseList() {
     setSelectedData([]);
   };
 
+  // Function to handle adding new expense
+  const handleSubmitExpense = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    
+    const newExpense = {
+      id: expenseData.length + 1,
+      name: formData.get('employeeName'),
+      employeeId: formData.get('employeeId'),
+      expenseAmount: parseFloat(formData.get('expenseAmount')),
+      expenseCategory: formData.get('expenseCategory'),
+      attachment: formData.get('attachment')?.name || null,
+      status: formData.get('status'),
+      image: "/images/profile-photo.jpg",
+      visibleCheckbox: true,
+      submittedDate: formData.get('submittedDate'),
+      approvalDate: formData.get('approvalDate') || null,
+    };
+
+    setExpenseData([...expenseData, newExpense]);
+    setShowAddModal(false);
+  };
+
   return (
     <section className="px-6 py-8">
       {/* Page Header */}
@@ -160,12 +184,14 @@ export default function ExpenseList() {
             </p>
           </div>
           <div className="flex space-x-3">
-            <IconButton
-              text="Add Expense"
-              icon="/icons/plus-Icon.svg"
-              bg="bg-red-600 hover:bg-red-700"
-              color="text-white"
-            />
+            <button onClick={() => setShowAddModal(true)}>
+              <IconButton
+                text="Add Expense"
+                icon="/icons/plus-Icon.svg"
+                bg="bg-red-600 hover:bg-red-700"
+                color="text-white"
+              />
+            </button>
             <IconButton
               text="Export"
               icon="/icons/export.svg"
@@ -240,6 +266,178 @@ export default function ExpenseList() {
           ))}
         </Table>
       </div>
+
+      {/* Add Expense Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold text-gray-900">Add New Expense</h2>
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <form onSubmit={handleSubmitExpense} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="employeeName" className="block text-sm font-medium text-gray-700 mb-1">
+                    Employee Name *
+                  </label>
+                  <input
+                    type="text"
+                    id="employeeName"
+                    name="employeeName"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                    placeholder="Enter employee name"
+                  />
+                </div>
+                
+                <div>
+                  <label htmlFor="employeeId" className="block text-sm font-medium text-gray-700 mb-1">
+                    Employee ID *
+                  </label>
+                  <input
+                    type="text"
+                    id="employeeId"
+                    name="employeeId"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                    placeholder="Enter employee ID"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="expenseAmount" className="block text-sm font-medium text-gray-700 mb-1">
+                    Expense Amount *
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    id="expenseAmount"
+                    name="expenseAmount"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                    placeholder="Enter expense amount"
+                  />
+                </div>
+                
+                <div>
+                  <label htmlFor="expenseCategory" className="block text-sm font-medium text-gray-700 mb-1">
+                    Expense Category *
+                  </label>
+                  <select
+                    id="expenseCategory"
+                    name="expenseCategory"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  >
+                    <option value="">Select Category</option>
+                    <option value="Travel">Travel</option>
+                    <option value="Office Supplies">Office Supplies</option>
+                    <option value="Equipment">Equipment</option>
+                    <option value="Meals">Meals</option>
+                    <option value="Training">Training</option>
+                    <option value="Software">Software</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="submittedDate" className="block text-sm font-medium text-gray-700 mb-1">
+                    Submitted Date *
+                  </label>
+                  <input
+                    type="date"
+                    id="submittedDate"
+                    name="submittedDate"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  />
+                </div>
+                
+                <div>
+                  <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
+                    Status *
+                  </label>
+                  <select
+                    id="status"
+                    name="status"
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  >
+                    <option value="">Select Status</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Declined">Declined</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="approvalDate" className="block text-sm font-medium text-gray-700 mb-1">
+                    Approval Date
+                  </label>
+                  <input
+                    type="date"
+                    id="approvalDate"
+                    name="approvalDate"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Leave empty for pending expenses
+                  </p>
+                </div>
+
+                <div>
+                  <label htmlFor="attachment" className="block text-sm font-medium text-gray-700 mb-1">
+                    Attachment
+                  </label>
+                  <input
+                    type="file"
+                    id="attachment"
+                    name="attachment"
+                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 file:mr-3 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-red-600 file:text-white hover:file:bg-red-700 file:cursor-pointer"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Supported formats: PDF, DOC, DOCX, JPG, JPEG, PNG
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  Add Expense
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

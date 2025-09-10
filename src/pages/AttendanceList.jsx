@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import Table from "../components/table/Table";
 import AttendanceListRow from "../components/table/rows/AttendanceListRow";
 import IconButton from "../components/buttons/IconButton";
@@ -107,9 +106,20 @@ export default function AttendanceList() {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [attendanceData, setAttendanceData] = useState(tableData);
+  const [newAttendance, setNewAttendance] = useState({
+    employeeName: '',
+    employeeId: '',
+    checkInTime: '',
+    checkOutTime: '',
+    reasonForLate: 'None',
+    date: '',
+    earlyOutReason: 'None'
+  });
 
   // Filter table data based on search term and date range
-  const filteredData = tableData.filter((attendance) => {
+  const filteredData = attendanceData.filter((attendance) => {
     const searchLower = searchTerm.toLowerCase();
     
     // Text search filter
@@ -161,6 +171,61 @@ export default function AttendanceList() {
     console.log("Filtered results:", filteredData.length, "records found");
   };
 
+  // Modal functions
+  const handleAddAttendance = () => {
+    setShowAddModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowAddModal(false);
+    setNewAttendance({
+      employeeName: '',
+      employeeId: '',
+      checkInTime: '',
+      checkOutTime: '',
+      reasonForLate: 'None',
+      date: '',
+      earlyOutReason: 'None'
+    });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewAttendance(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmitAttendance = (e) => {
+    e.preventDefault();
+    
+    // Generate new attendance ID
+    const newId = Math.max(...attendanceData.map(att => att.id)) + 1;
+    
+    // Create new attendance object
+    const attendanceToAdd = {
+      id: newId,
+      name: {
+        title: newAttendance.employeeName,
+        image: "/images/profile-photo.jpg", // Default image
+        visibleCheckbox: true,
+      },
+      employeeId: newAttendance.employeeId,
+      checkInTime: newAttendance.checkInTime,
+      checkOutTime: newAttendance.checkOutTime,
+      reasonForLate: newAttendance.reasonForLate,
+      date: newAttendance.date,
+      earlyOutReason: newAttendance.earlyOutReason,
+    };
+    
+    // Add to attendance data
+    setAttendanceData(prev => [...prev, attendanceToAdd]);
+    
+    // Close modal and reset form
+    handleCloseModal();
+  };
+
   const handleExportToExcel = () => {
     // Handle Excel export functionality here
     console.log("Exporting to Excel...");
@@ -173,7 +238,7 @@ export default function AttendanceList() {
           <h1 className="text-3xl font-bold text-gray-900 tracking-tight font-inter">Attendance List</h1>
           <p className="text-gray-600 mt-1">Track and monitor employee attendance records</p>
         </div>
-        <Link to="/attendance/add">
+        <button onClick={handleAddAttendance}>
           <IconButton
             text="Add Attendance"
             color="text-white"
@@ -181,7 +246,7 @@ export default function AttendanceList() {
             icon="/icons/plus-Icon.svg"
             className="hover:bg-red-700"
           />
-        </Link>
+        </button>
       </div>
 
       {/* Search and Filter Section */}
@@ -275,6 +340,168 @@ export default function AttendanceList() {
           ))}
         </Table>
       </div>
+
+      {/* Add Attendance Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full m-4 max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Add New Attendance</h2>
+                <button
+                  onClick={handleCloseModal}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmitAttendance} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Employee Name */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Employee Name *
+                    </label>
+                    <input
+                      type="text"
+                      name="employeeName"
+                      value={newAttendance.employeeName}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      placeholder="Enter employee name"
+                    />
+                  </div>
+
+                  {/* Employee ID */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Employee ID *
+                    </label>
+                    <input
+                      type="text"
+                      name="employeeId"
+                      value={newAttendance.employeeId}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      placeholder="e.g., EMP-12345"
+                    />
+                  </div>
+
+                  {/* Check In Time */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Check In Time *
+                    </label>
+                    <input
+                      type="time"
+                      name="checkInTime"
+                      value={newAttendance.checkInTime}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  {/* Check Out Time */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Check Out Time *
+                    </label>
+                    <input
+                      type="time"
+                      name="checkOutTime"
+                      value={newAttendance.checkOutTime}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  {/* Date */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Date *
+                    </label>
+                    <input
+                      type="date"
+                      name="date"
+                      value={newAttendance.date}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  {/* Reason For Late */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Reason For Late
+                    </label>
+                    <select
+                      name="reasonForLate"
+                      value={newAttendance.reasonForLate}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    >
+                      <option value="None">None</option>
+                      <option value="Traffic Jam">Traffic Jam</option>
+                      <option value="Medical Appointment">Medical Appointment</option>
+                      <option value="Personal Emergency">Personal Emergency</option>
+                      <option value="Public Transport Delay">Public Transport Delay</option>
+                      <option value="Gone To Hospital">Gone To Hospital</option>
+                      <option value="Family Emergency">Family Emergency</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Early Out Reason */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Early Out Reason
+                  </label>
+                  <select
+                    name="earlyOutReason"
+                    value={newAttendance.earlyOutReason}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  >
+                    <option value="None">None</option>
+                    <option value="Family Emergency">Family Emergency</option>
+                    <option value="Medical Appointment">Medical Appointment</option>
+                    <option value="Personal Emergency">Personal Emergency</option>
+                    <option value="Approved Leave">Approved Leave</option>
+                    <option value="Official Work">Official Work</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex justify-end space-x-3 pt-6">
+                  <button
+                    type="button"
+                    onClick={handleCloseModal}
+                    className="px-6 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                  >
+                    Add Attendance
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

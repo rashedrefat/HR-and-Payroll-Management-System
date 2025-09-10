@@ -2,12 +2,23 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Tooltip } from "react-tooltip";
-import { defaultImage } from "../../../constants";
+import { useCurrentAdminUser } from "../hooks/useCurrentAdminUser";
+import { useCurrentUser } from "../hooks/useCurrentUser";
+import { useAuth } from "../hooks/useAuth";
 
-export default function LoggedInUserInfoButton({ user }) {
+export default function LoggedInUserInfoButton() {
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
+  const { user } = useAuth();
+  
+  // Determine if user is admin (role_id === 2) or employee (role_id === 1)
+  const isAdmin = user?.role_id === 2;
+  const currentAdminUser = useCurrentAdminUser();
+  const currentEmployeeUser = useCurrentUser();
+  
+  // Use the appropriate user data based on role
+  const currentUser = isAdmin ? currentAdminUser : currentEmployeeUser;
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -21,6 +32,17 @@ export default function LoggedInUserInfoButton({ user }) {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const handleViewProfile = () => {
+    setShowDropdown(false);
+    if (isAdmin) {
+      // For admin users, navigate to admin profile in main layout
+      navigate("/profile");
+    } else {
+      // For employee users, navigate to employee profile
+      navigate("/employee/profile");
+    }
+  };
 
   const handleLogout = () => {
     // Clear user data
@@ -46,21 +68,21 @@ export default function LoggedInUserInfoButton({ user }) {
           <div className="flex items-center space-x-2">
             <img
               className="w-5 h-5 rounded-full border border-gray-300"
-              src={user?.profilePicture || defaultImage}
+              src={currentUser.profilePicture}
               alt="Profile"
             />
             <span
               data-tooltip-id="first-name"
               className="hidden md:block text-gray-700 font-medium text-sm whitespace-nowrap"
             >
-              Hello, {user?.firstName || 'User'}
+              Hello, {currentUser.firstName}
             </span>
           </div>
           <svg className="w-3 h-3 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
         </div>
-        <Tooltip id="first-name">{user?.firstName || 'User'}</Tooltip>
+        <Tooltip id="first-name">{currentUser.firstName}</Tooltip>
       </button>
 
       {/* Dropdown Menu */}
@@ -70,26 +92,25 @@ export default function LoggedInUserInfoButton({ user }) {
             <div className="flex items-center space-x-3">
               <img
                 className="w-10 h-10 rounded-full border-2 border-gray-200"
-                src={user?.profilePicture || defaultImage}
+                src={currentUser.profilePicture}
                 alt="Profile"
               />
               <div>
-                <p className="text-sm font-semibold text-gray-900">{user?.firstName || 'User'}</p>
-                <p className="text-xs text-gray-600">{user?.email || 'user@company.com'}</p>
+                <p className="text-sm font-semibold text-gray-900">{currentUser.fullName}</p>
+                <p className="text-xs text-gray-600">{currentUser.email}</p>
               </div>
             </div>
           </div>
           <div className="py-1">
-            <Link
-              to="/profile"
-              className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors duration-150"
-              onClick={() => setShowDropdown(false)}
+            <button
+              onClick={handleViewProfile}
+              className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors duration-150"
             >
               <svg className="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
               View Profile
-            </Link>
+            </button>
             <Link
               to="/settings"
               className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors duration-150"

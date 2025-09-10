@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useRegisterMutation } from "../../features/auth/authSlice";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -7,12 +8,14 @@ const Registration = () => {
     firstName: "",
     lastName: "",
     email: "",
+    phone: "",
     password: "",
     confirmPassword: "",
+    role: "employee", // default to employee
   });
+  const [register, { isLoading }] = useRegisterMutation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -21,7 +24,6 @@ const Registration = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (form.password !== form.confirmPassword) {
       toast.error("Passwords do not match!", {
         position: "top-right",
@@ -29,7 +31,6 @@ const Registration = () => {
       });
       return;
     }
-
     if (form.password.length < 6) {
       toast.error("Password must be at least 6 characters long!", {
         position: "top-right",
@@ -37,42 +38,74 @@ const Registration = () => {
       });
       return;
     }
-
-    setIsLoading(true);
-    
     try {
-      // Simulate API call - replace with actual registration logic
-      setTimeout(() => {
-        // Mock user data - replace with actual API response
-        const mockUser = {
-          id: Date.now(),
-          firstName: form.firstName,
-          lastName: form.lastName,
-          email: form.email,
-          profilePicture: null,
-          role: "user"
-        };
-        
-        // Store user data
-        localStorage.setItem("user", JSON.stringify(mockUser));
-        localStorage.setItem("access_token", "mock_token_" + Date.now());
-        
-        toast.success("Registration successful! Welcome aboard!", {
-          position: "top-right",
-          autoClose: 2000,
-        });
-        
-        // Redirect to dashboard
+      const payload = {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        phone: form.phone,
+        password: form.password,
+        password_confirmation: form.confirmPassword,
+        role: form.role,
+      };
+      
+      console.log("Sending registration payload:", payload);
+      const response = await register(payload).unwrap();
+      console.log("Registration response:", response);
+      
+      // Store user data and tokens
+      localStorage.setItem("user", JSON.stringify(response.user));
+      localStorage.setItem("access_token", response.token);
+      if (response.refresh_token) {
+        localStorage.setItem("refresh_token", response.refresh_token);
+      }
+      
+      // Store user role
+      const userRole = response.role || (response.user.role_id === 2 ? "admin" : "employee");
+      localStorage.setItem("userRole", userRole);
+      
+      // For employee registration, also store in employee key for employee components
+      if (userRole === "employee") {
+        localStorage.setItem("employee", JSON.stringify(response.user));
+      }
+      
+      toast.success(`Registration successful! Welcome aboard as ${userRole}!`, {
+        position: "top-right",
+        autoClose: 2000,
+      });
+      
+      // Redirect based on role
+      if (userRole === "admin") {
         navigate("/dashboard");
-        setIsLoading(false);
-      }, 1500);
+      } else {
+        navigate("/employee/dashboard");
+      }
     } catch (error) {
       console.error("Registration error:", error);
-      toast.error("Registration failed. Please try again.", {
-        position: "top-right",
-        autoClose: 3000,
-      });
-      setIsLoading(false);
+      
+      // Handle validation errors
+      if (error?.data?.errors) {
+        const firstError = Object.values(error.data.errors)[0][0];
+        toast.error(firstError, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      } else if (error?.data?.message) {
+        toast.error(error.data.message, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      } else if (error?.message) {
+        toast.error(error.message, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      } else {
+        toast.error("Registration failed. Please try again.", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      }
     }
   };
 
@@ -157,6 +190,104 @@ const Registration = () => {
               className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-sm"
               disabled={isLoading}
             />
+          </div>
+          <div className="space-y-2 col-span-2">
+            <label className="text-sm font-medium text-gray-700 block">Phone</label>
+            <input
+              type="tel"
+              name="phone"
+              value={form.phone}
+              onChange={handleChange}
+              required
+              placeholder="Enter your phone number"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-sm"
+              disabled={isLoading}
+            />
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700 block">Account Type</label>
+          <div className="grid grid-cols-2 gap-3">
+            <label className={`flex items-center p-4 rounded-lg border-2 cursor-pointer transition-all ${
+              form.role === 'employee' 
+                ? 'border-red-500 bg-red-50' 
+                : 'border-gray-300 bg-white hover:border-gray-400'
+            }`}>
+              <input
+                type="radio"
+                name="role"
+                value="employee"
+                checked={form.role === 'employee'}
+                onChange={handleChange}
+                className="sr-only"
+                disabled={isLoading}
+              />
+              <div className="flex items-center space-x-3">
+                <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                  form.role === 'employee' ? 'border-red-500' : 'border-gray-300'
+                }`}>
+                  {form.role === 'employee' && (
+                    <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                  )}
+                </div>
+                <div>
+                  <div className="font-medium text-gray-900">Employee</div>
+                  <div className="text-xs text-gray-500">Access to employee features</div>
+                </div>
+              </div>
+            </label>
+            
+            <label className={`flex items-center p-4 rounded-lg border-2 cursor-pointer transition-all ${
+              form.role === 'admin' 
+                ? 'border-red-500 bg-red-50' 
+                : 'border-gray-300 bg-white hover:border-gray-400'
+            }`}>
+              <input
+                type="radio"
+                name="role"
+                value="admin"
+                checked={form.role === 'admin'}
+                onChange={handleChange}
+                className="sr-only"
+                disabled={isLoading}
+              />
+              <div className="flex items-center space-x-3">
+                <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                  form.role === 'admin' ? 'border-red-500' : 'border-gray-300'
+                }`}>
+                  {form.role === 'admin' && (
+                    <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                  )}
+                </div>
+                <div>
+                  <div className="font-medium text-gray-900">Administrator</div>
+                  <div className="text-xs text-gray-500">Full system access</div>
+                </div>
+              </div>
+            </label>
+          </div>
+        </div>
+        
+        {/* Role Information */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-start space-x-3">
+            <div className="text-blue-500 mt-0.5">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <h4 className="font-medium text-blue-900">
+                {form.role === 'admin' ? 'Administrator Account' : 'Employee Account'}
+              </h4>
+              <p className="text-sm text-blue-700 mt-1">
+                {form.role === 'admin' 
+                  ? 'You will have full access to manage employees, payroll, reports, and system settings. A new organization will be created for you.'
+                  : 'You will have access to view your profile, attendance, payslips, and submit leave requests. You will need to be assigned to an organization by an administrator.'
+                }
+              </p>
+            </div>
           </div>
         </div>
         
@@ -245,7 +376,7 @@ const Registration = () => {
         <div className="text-center">
           <p className="text-sm text-gray-600">
             Already have an account?{" "}
-            <Link to="/signin" className="text-red-600 hover:text-red-700 font-medium">
+            <Link to="/login" className="text-red-600 hover:text-red-700 font-medium">
               Sign In
             </Link>
           </p>
