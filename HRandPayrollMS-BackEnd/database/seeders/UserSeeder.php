@@ -14,12 +14,12 @@ class UserSeeder extends Seeder
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
 
         $user1 = UserUser::firstOrCreate(
-            ['email' => 'lenden@owner.com'],
+            ['email' => 'sadiaafrin@gmail.com'],
             [
-                'firstName' => 'Lenden',
-                'lastName' => 'Owner',
-                'phone' => '01833445665',
-                'password' => Hash::make('password'),
+                'firstName' => 'Sadia',
+                'lastName' => 'Afrin',
+                'phone' => '01833445566',
+                'password' => Hash::make('123456'),
                 'tenant_id' => 1,
                 'role_id' => 1
             ]
@@ -27,12 +27,12 @@ class UserSeeder extends Seeder
         $user1->assignRole('hrms_owner');
 
         $user2 = UserUser::firstOrCreate(
-            ['email' => 'alex@gmail.com'],
+            ['email' => 'rashedulislamrefat@gmail.com'],
             [
-                'firstName' => 'Alex',
-                'lastName' => 'Smith',  // You can change lastName if needed
-                'phone' => '0123456789', // Add a phone number or leave blank if nullable
-                'password' => Hash::make('alex123'),
+                'firstName' => 'Rashed',
+                'lastName' => 'Refat',  // You can change lastName if needed
+                'phone' => '01934478672', // Add a phone number or leave blank if nullable
+                'password' => Hash::make('123456'),
                 'tenant_id' => 2,
                 'role_id' => 2 // Change role_id if needed
             ]

@@ -8,12 +8,17 @@ use App\Http\Controllers\Setting\GeneralSettingController;
 Route::get('/generalsetting', [GeneralSettingController::class, 'index']);
 Route::post('/generalsetting', [GeneralSettingController::class, 'setting']);
 
-/*
+// Company Settings Routes
+Route::prefix('company')->group(function () {
+    Route::get('/', [GeneralSettingController::class, 'index']);
+    Route::post('/', [GeneralSettingController::class, 'updateCompany']);
+    Route::post('/hr', [GeneralSettingController::class, 'updateHR']);
+});
+
 // General Settings Routes
 Route::prefix('settings')->group(function () {
     Route::get('general', [GeneralSettingController::class, 'index']);
     Route::post('general', [GeneralSettingController::class, 'setting']);
 });
-*/
 
 

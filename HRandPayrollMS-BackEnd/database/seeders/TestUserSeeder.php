@@ -14,9 +14,9 @@ class TestUserSeeder extends Seeder
         User::create([
             'firstName' => 'Admin',
             'lastName' => 'User',
-            'email' => 'admin@test.com',
+            'email' => 'rashedulislamrefat@gmail.com',
             'phone' => '1234567890',
-            'password' => Hash::make('password123'),
+            'password' => Hash::make('123456'),
             'status' => 1,
         ]);
 
@@ -34,9 +34,9 @@ class TestUserSeeder extends Seeder
         User::create([
             'firstName' => 'Sadia',
             'lastName' => 'Rahman',
-            'email' => 'sadia@test.com',
+            'email' => 'sadiaafrin@gmail.com',
             'phone' => '01712345678',
-            'password' => Hash::make('password123'),
+            'password' => Hash::make('123456'),
             'status' => 1,
             'role_id' => 1,
         ]);

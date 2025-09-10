@@ -24,12 +24,12 @@ class GeneralSetting extends Model
         'hr_email',
         'hr_phone',
         'hr_dept',
-        'hr_education',
+        'hr_education'
     ];
 
     protected $casts = [
-        'establish_year' => 'integer',
-        'employee_number' => 'integer',
         'hr_joindate' => 'date',
+        'establish_year' => 'integer',
+        'employee_number' => 'integer'
     ];
 }
