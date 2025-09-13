@@ -9,6 +9,8 @@ class Employee extends Model
 {
     use HasFactory;
 
+    protected $table = 'employees';
+
     protected $fillable = [
         'name',
         'email',
@@ -18,16 +20,18 @@ class Employee extends Model
         'designation_id',
         'status',
         'joining_date',
+        'image',
     ];
 
-    // Relationships
+    // Employee belongs to a department
     public function department()
     {
-        return $this->belongsTo(Department::class);
+        return $this->belongsTo(Departments::class, 'department_id');
     }
 
+    // Employee belongs to a designation
     public function designation()
     {
-        return $this->belongsTo(Designation::class);
+        return $this->belongsTo(Designations::class, 'designation_id');
     }
 }

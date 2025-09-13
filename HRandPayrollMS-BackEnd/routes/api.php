@@ -3,6 +3,10 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Setting\GeneralSettingController;
+use App\Http\Controllers\DepartmentsController;
+use App\Http\Controllers\DesignationsController;
+use App\Http\Controllers\EmployeeController;
+
 
 //Route
 Route::get('/generalsetting', [GeneralSettingController::class, 'index']);
@@ -21,4 +25,11 @@ Route::prefix('settings')->group(function () {
     Route::post('general', [GeneralSettingController::class, 'setting']);
 });
 
+// Departments Routes
+Route::apiResource('departments', DepartmentsController::class);
 
+// Designations Routes
+Route::apiResource('designations', DesignationsController::class);
+
+// Employees Routes
+Route::apiResource('employees', EmployeeController::class);
