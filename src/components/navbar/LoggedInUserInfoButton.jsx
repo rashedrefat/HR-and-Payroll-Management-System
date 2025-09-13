@@ -68,21 +68,21 @@ export default function LoggedInUserInfoButton() {
           <div className="flex items-center space-x-2">
             <img
               className="w-5 h-5 rounded-full border border-gray-300"
-              src={currentUser.profilePicture}
+              src={currentUser.profilePicture || currentUser.profile_picture || "/images/profile-photo.jpg"}
               alt="Profile"
             />
             <span
               data-tooltip-id="first-name"
               className="hidden md:block text-gray-700 font-medium text-sm whitespace-nowrap"
             >
-              Hello, {currentUser.firstName}
+              Hello, {currentUser.firstName || user?.firstName || user?.name?.split(' ')[0] || "User"}
             </span>
           </div>
           <svg className="w-3 h-3 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
         </div>
-        <Tooltip id="first-name">{currentUser.firstName}</Tooltip>
+        <Tooltip id="first-name">{currentUser.firstName || user?.firstName || user?.name?.split(' ')[0] || "User"}</Tooltip>
       </button>
 
       {/* Dropdown Menu */}
@@ -92,12 +92,12 @@ export default function LoggedInUserInfoButton() {
             <div className="flex items-center space-x-3">
               <img
                 className="w-10 h-10 rounded-full border-2 border-gray-200"
-                src={currentUser.profilePicture}
+                src={currentUser.profilePicture || currentUser.profile_picture || "/images/profile-photo.jpg"}
                 alt="Profile"
               />
               <div>
-                <p className="text-sm font-semibold text-gray-900">{currentUser.fullName}</p>
-                <p className="text-xs text-gray-600">{currentUser.email}</p>
+                <p className="text-sm font-semibold text-gray-900">{currentUser.fullName || `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || user?.name || "User"}</p>
+                <p className="text-xs text-gray-600">{currentUser.email || user?.email || ""}</p>
               </div>
             </div>
           </div>

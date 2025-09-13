@@ -10,8 +10,8 @@ export default function AllEmployeeTd({
       {data.visibleCheckbox && (
         <input
           type="checkbox"
-          onChange={(e) => selectRow(data.id, e)}
-          checked={Boolean(selectedData.find((id) => data.id === id))}
+          onChange={(e) => selectRow(data, e)}
+          checked={Boolean(selectedData.find((id) => id === data.id))}
           className="form-checkbox cursor-pointer accent-default-theme w-5 h-5 mx-3 rounded-md"
         />
       )}

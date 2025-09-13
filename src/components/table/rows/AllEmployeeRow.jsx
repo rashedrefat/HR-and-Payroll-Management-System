@@ -49,8 +49,8 @@ export default function AllEmployeeRow({ selectRow, selectedData, data, updateEm
     <tr className="hover:bg-gray-50">
       <TableData className="text-left">
         <AllEmployeeTd
-          data={data.name}
-          selectRow={selectRow}
+          data={{...data.name, id: data.id}}
+          selectRow={(nameData, e) => selectRow(data, e)}
           selectedData={selectedData}
         />
       </TableData>

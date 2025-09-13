@@ -7,6 +7,7 @@ export function useCurrentAdminUser() {
   if (!user || user.role_id !== 2) {
     return {
       fullName: "",
+      firstName: "",
       empId: "",
       email: "",
       phone: "",
@@ -14,12 +15,13 @@ export function useCurrentAdminUser() {
       designation: "",
       joinDate: "",
       address: "",
-      profilePicture: ""
+      profilePicture: "/images/profile-photo.jpg"
     };
   }
 
   return {
-    fullName: user.name || "",
+    fullName: user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim() || "",
+    firstName: user.firstName || user.name?.split(' ')[0] || "",
     empId: user.employee_id || "",
     email: user.email || "",
     phone: user.phone || "",
@@ -27,6 +29,6 @@ export function useCurrentAdminUser() {
     designation: user.designation?.name || "",
     joinDate: user.joining_date || "",
     address: user.address || "",
-    profilePicture: user.profile_picture || ""
+    profilePicture: user.profile_picture || user.image || "/images/profile-photo.jpg"
   };
 }
