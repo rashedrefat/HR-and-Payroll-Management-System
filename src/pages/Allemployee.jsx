@@ -340,23 +340,23 @@ export default function AllEmployee() {
               <span className="text-sm text-gray-600">
                 {selectedEmployees.length} selected
               </span>
-              <IconButton
+              <button
                 onClick={handleBulkActivate}
-                className="bg-green-100 hover:bg-green-200 text-green-700"
-                size="sm"
+                className="p-2 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg transition-colors"
+                title="Activate Selected"
               >
                 <TiTick className="w-4 h-4" />
-              </IconButton>
-              <IconButton
+              </button>
+              <button
                 onClick={handleBulkDeactivate}
-                className="bg-red-100 hover:bg-red-200 text-red-700"
-                size="sm"
+                className="p-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg transition-colors"
+                title="Deactivate Selected"
               >
                 <TiDelete className="w-4 h-4" />
-              </IconButton>
+              </button>
               <button
                 onClick={resetSelection}
-                className="text-sm text-gray-500 hover:text-gray-700"
+                className="text-sm text-gray-500 hover:text-gray-700 px-2 py-1 rounded transition-colors"
               >
                 Clear
               </button>

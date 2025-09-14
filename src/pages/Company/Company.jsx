@@ -532,11 +532,13 @@ const Company = () => {
                   {/* Company Stats */}
                   <div className="grid grid-cols-3 gap-4 mt-8 pt-6 border-t border-gray-200">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-red-600 mb-1">125</div>
+                      <div className="text-2xl font-bold text-red-600 mb-1">{companyInfo.employees || 0}</div>
                       <div className="text-sm text-gray-600">Total Employees</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-green-600 mb-1">6+</div>
+                      <div className="text-2xl font-bold text-green-600 mb-1">
+                        {companyInfo.established ? new Date().getFullYear() - parseInt(companyInfo.established) : 0}
+                      </div>
                       <div className="text-sm text-gray-600">Years Established</div>
                     </div>
                     <div className="text-center">
@@ -817,8 +819,8 @@ const Company = () => {
 
         {/* Add Company Modal */}
         {showAddCompanyModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="fixed inset-0 backdrop-blur-md flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold text-gray-900">Add Company Information</h2>
                 <button
@@ -1010,8 +1012,8 @@ const Company = () => {
 
         {/* Add HR Modal */}
         {showAddHRModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="fixed inset-0 backdrop-blur-md flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold text-gray-900">Add HR Information</h2>
                 <button
