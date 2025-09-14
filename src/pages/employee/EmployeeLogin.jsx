@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useLoginMutation } from "../../features/auth/authSlice";
+import { useDispatch } from "react-redux";
+import { useLoginMutation, setToken, setUser } from "../../features/auth/authSlice";
 
 export default function EmployeeLogin() {
   const [formData, setFormData] = useState({
@@ -11,6 +12,7 @@ export default function EmployeeLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const [login, { isLoading }] = useLoginMutation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,7 +27,11 @@ export default function EmployeeLogin() {
       
       console.log("Employee login response:", response);
       
-      // Store user data and tokens
+      // Store user data and tokens in Redux state
+      dispatch(setToken(response.access_token));
+      dispatch(setUser(response.user));
+      
+      // Also store in localStorage for persistence
       localStorage.setItem("user", JSON.stringify(response.user));
       localStorage.setItem("access_token", response.access_token);
       if (response.refresh_token) {

@@ -18,6 +18,12 @@ export const employeeApiSlice = apiSlice.injectEndpoints({
       providesTags: (result, error, id) => [{ type: "Employee", id }],
     }),
     
+    // Get current employee profile
+    getEmployeeProfile: builder.query({
+      query: () => "/employee/profile",
+      providesTags: ["EmployeeProfile"],
+    }),
+    
     // Create new employee
     createEmployee: builder.mutation({
       query: (newEmployee) => ({
@@ -64,6 +70,7 @@ export const employeeApiSlice = apiSlice.injectEndpoints({
 export const {
   useGetEmployeesQuery,
   useGetEmployeeQuery,
+  useGetEmployeeProfileQuery,
   useCreateEmployeeMutation,
   useUpdateEmployeeMutation,
   useDeleteEmployeeMutation,

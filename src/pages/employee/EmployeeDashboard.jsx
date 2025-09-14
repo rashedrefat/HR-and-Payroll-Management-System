@@ -1,21 +1,67 @@
 import React, { useMemo } from "react";
-import { useCurrentUser } from "../../components/hooks/useCurrentUser";
+import { useCurrentEmployee } from "../../components/hooks/useCurrentEmployee";
 
 export default function EmployeeDashboard() {
-  const currentUser = useCurrentUser();
+  const currentEmployee = useCurrentEmployee();
   
   const employeeData = useMemo(() => {
     return {
-      name: currentUser.fullName,
-      employeeId: currentUser.empId,
-      department: currentUser.department,
-      designation: currentUser.designation,
-      email: currentUser.email,
-      phone: currentUser.phone,
-      joinDate: currentUser.joinDate,
-      profilePicture: currentUser.profilePicture,
+      name: currentEmployee.fullName,
+      employeeId: currentEmployee.empId,
+      department: currentEmployee.department,
+      designation: currentEmployee.designation,
+      email: currentEmployee.email,
+      phone: currentEmployee.phone,
+      joinDate: currentEmployee.joinDate,
+      profilePicture: currentEmployee.profilePicture,
     };
-  }, [currentUser]);
+  }, [currentEmployee]);
+
+  // Handle loading state
+  if (currentEmployee.isLoading) {
+    return (
+      <section className="px-6 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 tracking-tight font-inter">Employee Dashboard</h1>
+          <p className="text-gray-600 mt-1">Loading your information...</p>
+        </div>
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <div className="animate-pulse">
+            <div className="flex items-center space-x-4">
+              <div className="h-20 w-20 bg-gray-300 rounded-full"></div>
+              <div className="space-y-2">
+                <div className="h-6 bg-gray-300 rounded w-48"></div>
+                <div className="h-4 bg-gray-300 rounded w-32"></div>
+                <div className="h-4 bg-gray-300 rounded w-40"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Handle error state
+  if (currentEmployee.error) {
+    return (
+      <section className="px-6 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 tracking-tight font-inter">Employee Dashboard</h1>
+          <p className="text-red-600 mt-1">Unable to load employee information</p>
+        </div>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+          <div className="flex items-center">
+            <svg className="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="text-red-800">
+              {currentEmployee.error?.data?.error || 'Failed to load employee data. Please ensure you are logged in with an employee account.'}
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="px-6 py-8">

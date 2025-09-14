@@ -1,14 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useCurrentUser } from "../hooks/useCurrentUser";
+import { useCurrentEmployee } from "../hooks/useCurrentEmployee";
 
 export default function EmployeeNavbar() {
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
   const [notificationPopup, setNotificationPopup] = useState(false);
   const dropdownRef = useRef(null);
-  const currentUser = useCurrentUser();
+  const currentEmployee = useCurrentEmployee();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -128,15 +128,15 @@ export default function EmployeeNavbar() {
                   <div className="flex items-center space-x-3">
                     <img
                       className="w-8 h-8 rounded-full object-cover border-2 border-gray-300 shadow-sm"
-                      src={currentUser.profilePicture}
-                      alt={currentUser.fullName}
+                      src={currentEmployee.profilePicture}
+                      alt={currentEmployee.fullName}
                     />
                     <div className="text-left hidden sm:block">
                       <div className="text-sm font-semibold text-gray-900 leading-tight">
-                        {currentUser.firstName}
+                        {currentEmployee.name}
                       </div>
                       <div className="text-xs text-gray-500 leading-tight">
-                        EMP-{currentUser.empId}
+                        ID-{currentEmployee.empId}
                       </div>
                     </div>
                   </div>
@@ -153,15 +153,15 @@ export default function EmployeeNavbar() {
                     <div className="flex items-center space-x-3">
                       <img
                         className="w-10 h-10 rounded-full object-cover border-2 border-gray-300"
-                        src={currentUser.profilePicture}
-                        alt={currentUser.fullName}
+                        src={currentEmployee.profilePicture}
+                        alt={currentEmployee.fullName}
                       />
                       <div>
                         <div className="font-semibold text-gray-900">
-                          {currentUser.fullName}
+                          {currentEmployee.fullName}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {currentUser.email}
+                          {currentEmployee.email}
                         </div>
                       </div>
                     </div>

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useLoginMutation } from "../../features/auth/authSlice";
+import { useDispatch } from "react-redux";
+import { useLoginMutation, setToken, setUser } from "../../features/auth/authSlice";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -9,6 +10,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [login, { isLoading }] = useLoginMutation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,7 +21,11 @@ const Login = () => {
       const response = await login({ email, password }).unwrap();
       console.log("Login response:", response);
       
-      // Store user data and tokens
+      // Store user data and tokens in Redux state
+      dispatch(setToken(response.access_token));
+      dispatch(setUser(response.user));
+      
+      // Also store in localStorage for persistence
       localStorage.setItem("user", JSON.stringify(response.user));
       localStorage.setItem("access_token", response.access_token);
       if (response.refresh_token) {

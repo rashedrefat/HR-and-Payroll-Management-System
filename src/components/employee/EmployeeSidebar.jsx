@@ -1,11 +1,11 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import PortalPageButton from "../sidebar/PortalPageButton";
-import { useCurrentUser } from "../hooks/useCurrentUser";
+import { useCurrentEmployee } from "../hooks/useCurrentEmployee";
 
 export default function EmployeeSidebar() {
   const location = useLocation();
-  const currentUser = useCurrentUser();
+  const currentEmployee = useCurrentEmployee();
 
   const menuItems = [
     {
@@ -57,15 +57,15 @@ export default function EmployeeSidebar() {
           <div className="flex items-center space-x-3">
             <img
               className="h-12 w-12 rounded-full object-cover border-2 border-red-200"
-              src={currentUser.profilePicture}
-              alt={currentUser.fullName}
+              src={currentEmployee.profilePicture}
+              alt={currentEmployee.fullName}
             />
             <div>
               <h3 className="text-sm font-semibold text-gray-900">
-                {currentUser.fullName}
+                {currentEmployee.fullName}
               </h3>
               <p className="text-xs text-gray-600">
-                ID: {currentUser.employeeId}
+                ID: {currentEmployee.employeeId}
               </p>
             </div>
           </div>
