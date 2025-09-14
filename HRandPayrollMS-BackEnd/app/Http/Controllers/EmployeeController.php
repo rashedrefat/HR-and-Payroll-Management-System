@@ -79,4 +79,47 @@ class EmployeeController extends Controller
 
         return response()->json(['message' => 'Employee deleted successfully'], 200);
     }
+
+    // Get current authenticated employee profile
+    public function profile(Request $request)
+    {
+        $user = $request->user();
+        
+        if (!$user) {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
+
+        // Log user for debugging
+        \Log::info('User authenticated in employee profile:', ['user_id' => $user->id, 'email' => $user->email]);
+
+        // Find employee by matching email
+        $employee = Employee::with(['department', 'designation'])
+            ->where('email', $user->email)
+            ->first();
+
+        if (!$employee) {
+            \Log::warning('Employee record not found for user:', ['user_email' => $user->email]);
+            return response()->json(['error' => 'Employee record not found'], 404);
+        }
+
+        \Log::info('Employee found:', ['employee_id' => $employee->id, 'employee_name' => $employee->name]);
+
+        // Format the response data
+        $employeeData = [
+            'id' => $employee->id,
+            'name' => $employee->name,
+            'email' => $employee->email,
+            'employee_id' => $employee->employee_id,
+            'mobile' => $employee->mobile,
+            'department' => $employee->department ? $employee->department->name : null,
+            'department_id' => $employee->department_id,
+            'designation' => $employee->designation ? $employee->designation->name : null,
+            'designation_id' => $employee->designation_id,
+            'status' => $employee->status,
+            'joining_date' => $employee->joining_date,
+            'image' => $employee->image ? url('storage/employee_images/' . $employee->image) : null,
+        ];
+
+        return response()->json($employeeData, 200);
+    }
 }

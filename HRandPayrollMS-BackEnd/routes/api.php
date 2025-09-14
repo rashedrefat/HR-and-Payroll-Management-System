@@ -33,3 +33,4 @@ Route::apiResource('designations', DesignationsController::class);
 
 // Employees Routes
 Route::apiResource('employees', EmployeeController::class);
+Route::middleware('auth:sanctum')->get('employee/profile', [EmployeeController::class, 'profile']);
