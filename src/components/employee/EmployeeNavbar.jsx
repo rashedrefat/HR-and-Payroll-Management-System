@@ -136,7 +136,7 @@ export default function EmployeeNavbar() {
                         {currentEmployee.name}
                       </div>
                       <div className="text-xs text-gray-500 leading-tight">
-                        ID-{currentEmployee.empId}
+                        ID: {currentEmployee.empId}
                       </div>
                     </div>
                   </div>

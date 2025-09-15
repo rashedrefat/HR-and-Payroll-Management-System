@@ -70,8 +70,6 @@ export const useCurrentEmployee = () => {
     }
 
     // Format the employee data for consistent use across components
-    console.log('Raw employee data from API:', employeeData); // Debug log
-    
     return {
       // Different naming conventions for compatibility
       fullName: employeeData.name,
