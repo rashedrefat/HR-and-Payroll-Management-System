@@ -117,9 +117,52 @@ class EmployeeController extends Controller
             'designation_id' => $employee->designation_id,
             'status' => $employee->status,
             'joining_date' => $employee->joining_date,
-            'image' => $employee->image ? url('storage/employee_images/' . $employee->image) : null,
+            'image' => $this->getEmployeeImageUrl($employee->image),
         ];
 
         return response()->json($employeeData, 200);
+    }
+
+    /**
+     * Get the proper image URL for an employee
+     */
+    private function getEmployeeImageUrl($imagePath)
+    {
+        if (!$imagePath) {
+            return null;
+        }
+
+        // If it's already a full URL, return as is
+        if (str_starts_with($imagePath, 'http')) {
+            return $imagePath;
+        }
+
+        // If it starts with /images/ (like /images/sadia-pic.jpg), construct the full URL
+        if (str_starts_with($imagePath, '/images/')) {
+            return url($imagePath);
+        }
+
+        // If it starts with images/ (like images/sadia-pic.jpg), construct the full URL
+        if (str_starts_with($imagePath, 'images/')) {
+            return url('/' . $imagePath);
+        }
+
+        // If it starts with /storage/ (like /storage/employee_images/file.jpg)
+        if (str_starts_with($imagePath, '/storage/')) {
+            return url($imagePath);
+        }
+
+        // If it starts with storage/ (like storage/employee_images/file.jpg)
+        if (str_starts_with($imagePath, 'storage/')) {
+            return url('/' . $imagePath);
+        }
+
+        // If it starts with employee_images/ (like employee_images/file.jpg)
+        if (str_starts_with($imagePath, 'employee_images/')) {
+            return url('storage/' . $imagePath);
+        }
+
+        // If it's just a filename or any other format, try storage path first
+        return url('storage/employee_images/' . $imagePath);
     }
 }
