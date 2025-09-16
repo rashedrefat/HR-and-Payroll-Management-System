@@ -2,13 +2,17 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Tooltip } from "react-tooltip";
+import { useDispatch } from "react-redux";
 import { useCurrentAdminUser } from "../hooks/useCurrentAdminUser";
 import { useCurrentUser } from "../hooks/useCurrentUser";
 import { useAuth } from "../hooks/useAuth";
+import { apiSlice } from "../../features/api/apiSlice";
+import { logout as logoutAction } from "../../features/auth/authSlice";
 
 export default function LoggedInUserInfoButton() {
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const dropdownRef = useRef(null);
   const { user } = useAuth();
   
@@ -45,9 +49,19 @@ export default function LoggedInUserInfoButton() {
   };
 
   const handleLogout = () => {
+    // Clear Redux state and cache
+    dispatch(logoutAction());
+    dispatch(apiSlice.util.resetApiState());
+    
     // Clear user data
     localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
     localStorage.removeItem("user");
+    localStorage.removeItem("employee");
+    localStorage.removeItem("userRole");
+    
+    console.log("Admin user logged out, all data cleared");
+    
     toast.success("Logged out successfully!", {
       position: "top-right",
       autoClose: 1500,

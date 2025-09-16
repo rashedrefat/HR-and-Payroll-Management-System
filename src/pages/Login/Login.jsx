@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { useLoginMutation, setToken, setUser } from "../../features/auth/authSlice";
+import { apiSlice } from "../../features/api/apiSlice";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -17,6 +18,16 @@ const Login = () => {
     
     try {
       console.log("Attempting login with:", { email, password });
+      
+      // Clear any previous user data and cache before login
+      localStorage.removeItem("user");
+      localStorage.removeItem("employee");
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+      localStorage.removeItem("userRole");
+      
+      // Clear RTK Query cache to ensure fresh data for new user
+      dispatch(apiSlice.util.resetApiState());
       
       const response = await login({ email, password }).unwrap();
       console.log("Login response:", response);
@@ -40,6 +51,8 @@ const Login = () => {
       if (userRole === "employee") {
         localStorage.setItem("employee", JSON.stringify(response.user));
       }
+      
+      console.log("Login successful for user:", response.user.email, "with role:", userRole);
       
       toast.success(`Login successful as ${userRole}!`, {
         position: "top-right",

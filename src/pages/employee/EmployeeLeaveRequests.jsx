@@ -1,10 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useCurrentEmployee } from "../../components/hooks/useCurrentEmployee";
 
 export default function EmployeeLeaveRequests() {
+  const currentEmployee = useCurrentEmployee();
   const [showNewRequestForm, setShowNewRequestForm] = useState(false);
   const [leaveRequests, setLeaveRequests] = useState([
     {
       id: 1,
+      name: "Loading...",
+      employeeId: "Loading...",
       type: "Annual Leave",
       startDate: "2025-09-01",
       endDate: "2025-09-03",
@@ -14,6 +18,8 @@ export default function EmployeeLeaveRequests() {
     },
     {
       id: 2,
+      name: "Loading...",
+      employeeId: "Loading...",
       type: "Sick Leave",
       startDate: "2025-08-15",
       endDate: "2025-08-16",
@@ -22,6 +28,17 @@ export default function EmployeeLeaveRequests() {
       status: "Pending"
     }
   ]);
+
+  // Update leave requests with current employee data when it loads
+  useEffect(() => {
+    if (currentEmployee.name && currentEmployee.employeeId && !currentEmployee.isLoading) {
+      setLeaveRequests(prev => prev.map(request => ({
+        ...request,
+        name: currentEmployee.name,
+        employeeId: currentEmployee.employeeId
+      })));
+    }
+  }, [currentEmployee.name, currentEmployee.employeeId, currentEmployee.isLoading]);
 
   const [newRequest, setNewRequest] = useState({
     type: "Annual Leave",
@@ -54,6 +71,8 @@ export default function EmployeeLeaveRequests() {
     
     const requestToAdd = {
       id: leaveRequests.length + 1,
+      name: currentEmployee.name || "Unknown",
+      employeeId: currentEmployee.employeeId || "Unknown",
       ...newRequest,
       days,
       status: "Pending"
@@ -102,7 +121,9 @@ export default function EmployeeLeaveRequests() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Leave Type</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">End Date</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Days</th>
@@ -113,6 +134,12 @@ export default function EmployeeLeaveRequests() {
             <tbody className="bg-white divide-y divide-gray-200">
               {leaveRequests.map((request) => (
                 <tr key={request.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {request.name}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {request.employeeId}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {request.type}
                   </td>

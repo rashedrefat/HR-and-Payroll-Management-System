@@ -4,6 +4,15 @@ import { useGetEmployeeProfileQuery } from '../../features/api/employeeApiSlice'
 export const useCurrentEmployee = () => {
   const { data: employeeData, isLoading, error } = useGetEmployeeProfileQuery();
 
+  // Debug logging
+  console.log('useCurrentEmployee - isLoading:', isLoading);
+  console.log('useCurrentEmployee - error:', error);
+  console.log('useCurrentEmployee - employeeData:', employeeData);
+  if (employeeData) {
+    console.log('useCurrentEmployee - designation specifically:', employeeData.designation);
+    console.log('useCurrentEmployee - department specifically:', employeeData.department);
+  }
+
   const formattedEmployeeData = useMemo(() => {
     if (isLoading) {
       return {

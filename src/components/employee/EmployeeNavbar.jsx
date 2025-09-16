@@ -1,10 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
 import { useCurrentEmployee } from "../hooks/useCurrentEmployee";
+import { apiSlice } from "../../features/api/apiSlice";
+import { logout as logoutAction } from "../../features/auth/authSlice";
 
 export default function EmployeeNavbar() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [showDropdown, setShowDropdown] = useState(false);
   const [notificationPopup, setNotificationPopup] = useState(false);
   const dropdownRef = useRef(null);
@@ -24,10 +28,18 @@ export default function EmployeeNavbar() {
   }, []);
 
   const handleLogout = () => {
+    // Clear Redux state and cache
+    dispatch(logoutAction());
+    dispatch(apiSlice.util.resetApiState());
+    
+    // Clear localStorage
     localStorage.removeItem("employee");
     localStorage.removeItem("user");
     localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
     localStorage.removeItem("userRole");
+    
+    console.log("User logged out, all data cleared");
     
     toast.success("Logged out successfully!", {
       position: "top-right",

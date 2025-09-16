@@ -10,7 +10,7 @@ const tableLabels = [
   { title: "Employee ID", sort: true },
   { title: "Start Date", sort: true },
   { title: "End Date", sort: true },
-  { title: "Count", sort: true },
+  { title: "Days", sort: true },
   { title: "Leave Reason", sort: true },
   { title: "Status", sort: true },
   { title: "Action", sort: false },
