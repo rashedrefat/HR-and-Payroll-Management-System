@@ -113,7 +113,7 @@ class EmployeeController extends Controller
             'mobile' => $employee->mobile,
             'department' => $employee->department ? $employee->department->name : null,
             'department_id' => $employee->department_id,
-            'designation' => $employee->designation ? $employee->designation->name : null,
+            'designation' => $employee->designation ? $employee->designation->title : null,
             'designation_id' => $employee->designation_id,
             'status' => $employee->status,
             'joining_date' => $employee->joining_date,
