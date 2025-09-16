@@ -6,6 +6,7 @@ use App\Http\Controllers\Setting\GeneralSettingController;
 use App\Http\Controllers\DepartmentsController;
 use App\Http\Controllers\DesignationsController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\LeaveRequestController;
 
 
 //Route
@@ -34,3 +35,12 @@ Route::apiResource('designations', DesignationsController::class);
 // Employees Routes
 Route::apiResource('employees', EmployeeController::class);
 Route::middleware('auth:sanctum')->get('employee/profile', [EmployeeController::class, 'profile']);
+
+// Leave Requests Routes
+Route::get('leave-requests', [LeaveRequestController::class, 'index']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('leave-requests', [LeaveRequestController::class, 'store']);
+    Route::put('leave-requests/{id}', [LeaveRequestController::class, 'update']);
+    Route::delete('leave-requests/{id}', [LeaveRequestController::class, 'destroy']);
+    Route::patch('leave-requests/{id}/status', [LeaveRequestController::class, 'updateStatus']);
+});
