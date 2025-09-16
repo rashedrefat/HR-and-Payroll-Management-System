@@ -7,6 +7,7 @@ use App\Http\Controllers\DepartmentsController;
 use App\Http\Controllers\DesignationsController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\LeaveRequestController;
+use App\Http\Controllers\AttendanceController;
 
 
 //Route
@@ -44,4 +45,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('leave-requests/{id}', [LeaveRequestController::class, 'update']);
     Route::delete('leave-requests/{id}', [LeaveRequestController::class, 'destroy']);
     Route::patch('leave-requests/{id}/status', [LeaveRequestController::class, 'updateStatus']);
+});
+
+
+// Attendance Routes
+Route::get('attendances', [AttendanceController::class, 'index']); // Admin: Get all attendances
+Route::post('attendances', [AttendanceController::class, 'store']); // Admin create (no auth)
+Route::put('attendances/{id}', [AttendanceController::class, 'update']); // Admin update (no auth)
+Route::delete('attendances/{id}', [AttendanceController::class, 'destroy']); // Admin delete (no auth)
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('my-attendances', [AttendanceController::class, 'myAttendances']); // Employee: Get own attendances
+    Route::post('my-attendances', [AttendanceController::class, 'store']); // Employee: Create attendance
+    Route::put('my-attendances/{id}', [AttendanceController::class, 'update']); // Employee: Update own attendance
+    Route::delete('my-attendances/{id}', [AttendanceController::class, 'destroy']); // Employee: Delete own attendance
 });
