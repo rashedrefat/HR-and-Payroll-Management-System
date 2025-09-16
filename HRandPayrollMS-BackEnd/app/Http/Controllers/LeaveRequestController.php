@@ -7,13 +7,36 @@ use Illuminate\Http\Request;
 
 class LeaveRequestController extends Controller
 {
-    // Get all leave requests
+    // Get all leave requests (Admin only)
     public function index()
     {
         return response()->json(
             LeaveRequest::with(['employee'])->get(),
             200
         );
+    }
+
+    // Get leave requests for authenticated employee only
+    public function myLeaveRequests(Request $request)
+    {
+        $user = $request->user();
+        
+        if (!$user) {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
+
+        $employee = \App\Models\Employee::where('email', $user->email)->first();
+        
+        if (!$employee) {
+            return response()->json(['error' => 'Employee record not found'], 404);
+        }
+
+        $leaveRequests = LeaveRequest::with(['employee'])
+            ->where('employee_id', $employee->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($leaveRequests, 200);
     }
 
     // Store new leave request

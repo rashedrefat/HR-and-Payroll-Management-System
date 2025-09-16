@@ -37,8 +37,9 @@ Route::apiResource('employees', EmployeeController::class);
 Route::middleware('auth:sanctum')->get('employee/profile', [EmployeeController::class, 'profile']);
 
 // Leave Requests Routes
-Route::get('leave-requests', [LeaveRequestController::class, 'index']);
+Route::get('leave-requests', [LeaveRequestController::class, 'index']); // Admin: Get all leave requests
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('my-leave-requests', [LeaveRequestController::class, 'myLeaveRequests']); // Employee: Get own leave requests
     Route::post('leave-requests', [LeaveRequestController::class, 'store']);
     Route::put('leave-requests/{id}', [LeaveRequestController::class, 'update']);
     Route::delete('leave-requests/{id}', [LeaveRequestController::class, 'destroy']);
