@@ -8,6 +8,8 @@ use App\Http\Controllers\DesignationsController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\SalaryStructureController;
+use App\Http\Controllers\EmployeeSalariesController;
 
 
 //Route
@@ -60,3 +62,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('my-attendances/{id}', [AttendanceController::class, 'update']); // Employee: Update own attendance
     Route::delete('my-attendances/{id}', [AttendanceController::class, 'destroy']); // Employee: Delete own attendance
 });
+
+// Salary Structure Routes
+Route::apiResource('salary-structures', SalaryStructureController::class);
+
+// Employee Salaries Routes
+Route::apiResource('employee-salaries', EmployeeSalariesController::class);

@@ -83,7 +83,7 @@ export default function Salary() {
 
   // Table headers for salary settings
   const salarySettingsLabels = [
-    { title: "#", sort: false },
+    { title: "Serial", sort: false },
     { title: "Name", sort: true },
     { title: "Percentage", sort: true },
     { title: "Action", sort: false },
@@ -91,7 +91,7 @@ export default function Salary() {
 
   // Table headers for payslip records
   const payslipLabels = [
-    { title: "#", sort: false },
+    { title: "Serial", sort: false },
     { title: "Name", sort: true },
     { title: "Employee ID", sort: true },
     { title: "Salary", sort: true },
