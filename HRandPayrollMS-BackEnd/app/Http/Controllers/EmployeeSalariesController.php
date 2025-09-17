@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\EmployeeSalaryResource;
 use App\Models\EmployeeSalaries;
 use Illuminate\Http\Request;
 
@@ -13,7 +14,8 @@ class EmployeeSalariesController extends Controller
      */
     public function index()
     {
-        return response()->json(EmployeeSalaries::all(), 200);
+        $employeeSalaries = EmployeeSalaries::all();
+        return EmployeeSalaryResource::collection($employeeSalaries);
     }
 
     /**
@@ -29,6 +31,29 @@ class EmployeeSalariesController extends Controller
      */
     public function store(Request $request)
     {
+        // Map frontend status to database status
+        $statusMapping = [
+            'pending' => 'pending',
+            'approved' => 'paid',
+            'rejected' => 'unpaid'
+        ];
+
+        $frontendStatus = $request->input('status', 'pending');
+        $databaseStatus = $statusMapping[$frontendStatus] ?? $frontendStatus;
+
+        // Convert camelCase to snake_case for database storage
+        $data = [
+            'name' => $request->input('name'),
+            'employee_id' => $request->input('employeeId') ?? $request->input('employee_id'),
+            'salary' => $request->input('salary'),
+            'adjustment_amount' => $request->input('adjustmentAmount') ?? $request->input('adjustment_amount', 0),
+            'adjustment_reason' => $request->input('adjustmentReason') ?? $request->input('adjustment_reason'),
+            'after_adjustment_salary' => $request->input('afterAdjustmentSalary') ?? $request->input('after_adjustment_salary'),
+            'status' => $databaseStatus,
+        ];
+
+        $request->merge($data);
+
         $request->validate([
             'name' => 'required|string|max:255',
             'employee_id' => 'required|string|max:255',
@@ -36,12 +61,12 @@ class EmployeeSalariesController extends Controller
             'adjustment_amount' => 'nullable|numeric',
             'adjustment_reason' => 'nullable|string|max:255',
             'after_adjustment_salary' => 'required|numeric|min:0',
-            'status' => 'required|in:pending,paid,unpaid',
+            'status' => 'required|in:pending,paid,unpaid,approved,rejected',
         ]);
 
-        $employeeSalary = EmployeeSalaries::create($request->all());
+        $employeeSalary = EmployeeSalaries::create($data);
 
-        return response()->json($employeeSalary, 201);
+        return new EmployeeSalaryResource($employeeSalary);
     }
 
     /**
@@ -49,7 +74,8 @@ class EmployeeSalariesController extends Controller
      */
     public function show(string $id)
     {
-        return response()->json(EmployeeSalaries::findOrFail($id), 200);
+        $employeeSalary = EmployeeSalaries::findOrFail($id);
+        return new EmployeeSalaryResource($employeeSalary);
     }
 
     /**
@@ -67,6 +93,34 @@ class EmployeeSalariesController extends Controller
     {
         $employeeSalary = EmployeeSalaries::findOrFail($id);
 
+        // Map frontend status to database status
+        $statusMapping = [
+            'pending' => 'pending',
+            'approved' => 'paid',
+            'rejected' => 'unpaid'
+        ];
+
+        $frontendStatus = $request->input('status');
+        $databaseStatus = $frontendStatus ? ($statusMapping[$frontendStatus] ?? $frontendStatus) : null;
+
+        // Convert camelCase to snake_case for database storage
+        $data = [
+            'name' => $request->input('name'),
+            'employee_id' => $request->input('employeeId') ?? $request->input('employee_id'),
+            'salary' => $request->input('salary'),
+            'adjustment_amount' => $request->input('adjustmentAmount') ?? $request->input('adjustment_amount'),
+            'adjustment_reason' => $request->input('adjustmentReason') ?? $request->input('adjustment_reason'),
+            'after_adjustment_salary' => $request->input('afterAdjustmentSalary') ?? $request->input('after_adjustment_salary'),
+            'status' => $databaseStatus,
+        ];
+
+        // Remove null values to only update provided fields
+        $data = array_filter($data, function($value) {
+            return $value !== null;
+        });
+
+        $request->merge($data);
+
         $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'employee_id' => 'sometimes|required|string|max:255',
@@ -74,12 +128,12 @@ class EmployeeSalariesController extends Controller
             'adjustment_amount' => 'nullable|numeric',
             'adjustment_reason' => 'nullable|string|max:255',
             'after_adjustment_salary' => 'sometimes|required|numeric|min:0',
-            'status' => 'sometimes|required|in:pending,paid,unpaid',
+            'status' => 'sometimes|required|in:pending,paid,unpaid,approved,rejected',
         ]);
 
-        $employeeSalary->update($request->all());
+        $employeeSalary->update($data);
 
-        return response()->json($employeeSalary, 200);
+        return new EmployeeSalaryResource($employeeSalary);
     }
 
     /**
