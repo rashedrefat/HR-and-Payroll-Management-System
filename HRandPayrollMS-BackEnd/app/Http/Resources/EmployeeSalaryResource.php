@@ -31,6 +31,7 @@ class EmployeeSalaryResource extends JsonResource
             'adjustmentAmount' => (float) $this->adjustment_amount,
             'adjustmentReason' => $this->adjustment_reason,
             'afterAdjustmentSalary' => (float) $this->after_adjustment_salary,
+            'monthYear' => $this->month_year,
             'status' => $frontendStatus,
             'createdAt' => $this->created_at,
             'updatedAt' => $this->updated_at,

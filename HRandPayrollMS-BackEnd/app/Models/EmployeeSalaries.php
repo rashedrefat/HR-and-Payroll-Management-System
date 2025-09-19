@@ -18,6 +18,7 @@ class EmployeeSalaries extends Model
         'adjustment_amount',
         'adjustment_reason',
         'after_adjustment_salary',
+        'month_year',
         'status',
     ];
 }

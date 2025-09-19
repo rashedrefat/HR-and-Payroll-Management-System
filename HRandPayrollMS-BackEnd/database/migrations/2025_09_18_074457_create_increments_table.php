@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
 
             // foreign key to employees.id (numeric PK)
-            $table->foreignId('employee_id')->constrained('employees')->onDelete('cascade');
+            $table->string('employee_id'); // Make sure this is VARCHAR in DB, not INT
+            $table->foreign('employee_id')->references('employee_id')->on('employees')->onDelete('cascade');
 
             $table->decimal('salary', 10, 2);
             $table->date('last_increment_date')->nullable();

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->decimal('adjustment_amount', 10, 2)->default(0); // Adjustment amount (+/-)
             $table->string('adjustment_reason')->nullable();         // Reason for adjustment
             $table->decimal('after_adjustment_salary', 10, 2);       // Final salary after adjustment
+            $table->string('month_year');                  // Month and year (e.g., 'August 2025')
             $table->enum('status', ['pending', 'paid', 'unpaid'])->default('pending'); // Status
             $table->timestamps();
         });

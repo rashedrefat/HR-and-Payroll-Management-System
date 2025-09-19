@@ -49,6 +49,7 @@ class EmployeeSalariesController extends Controller
             'adjustment_amount' => $request->input('adjustmentAmount') ?? $request->input('adjustment_amount', 0),
             'adjustment_reason' => $request->input('adjustmentReason') ?? $request->input('adjustment_reason'),
             'after_adjustment_salary' => $request->input('afterAdjustmentSalary') ?? $request->input('after_adjustment_salary'),
+            'month_year' => $request->input('monthYear') ?? $request->input('month_year'),
             'status' => $databaseStatus,
         ];
 
@@ -111,6 +112,7 @@ class EmployeeSalariesController extends Controller
             'adjustment_amount' => $request->input('adjustmentAmount') ?? $request->input('adjustment_amount'),
             'adjustment_reason' => $request->input('adjustmentReason') ?? $request->input('adjustment_reason'),
             'after_adjustment_salary' => $request->input('afterAdjustmentSalary') ?? $request->input('after_adjustment_salary'),
+            'month_year' => $request->input('monthYear') ?? $request->input('month_year'),
             'status' => $databaseStatus,
         ];
 

@@ -18,6 +18,6 @@ class Increment extends Model
     // Relation to employee (employees.id)
     public function employee()
     {
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(Employee::class, 'employee_id', 'employee_id');
     }
 }

@@ -18,8 +18,8 @@ class IncrementController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            // this checks numeric PK `employees.id`
-            'employee_id' => 'required|exists:employees,id',
+            // this checks string employee_id in employees table
+            'employee_id' => 'required|exists:employees,employee_id',
             'salary' => 'required|numeric',
             'last_increment_date' => 'nullable|date',
         ]);

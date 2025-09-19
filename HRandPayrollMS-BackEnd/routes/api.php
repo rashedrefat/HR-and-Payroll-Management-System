@@ -11,7 +11,8 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\SalaryStructureController;
 use App\Http\Controllers\EmployeeSalariesController;
 use App\Http\Controllers\IncrementController;
-
+use App\Http\Controllers\ShiftController;
+use App\Http\Controllers\LeaveTypeController;   
 
 //Route
 Route::get('/generalsetting', [GeneralSettingController::class, 'index']);
@@ -72,3 +73,9 @@ Route::apiResource('employee-salaries', EmployeeSalariesController::class);
 
 // Increment Routes
 Route::apiResource('increments', IncrementController::class);
+
+// Shift Routes
+Route::apiResource('shifts', ShiftController::class);
+
+// Leave Type Routes
+Route::apiResource('leave-types', \App\Http\Controllers\LeaveTypeController::class);

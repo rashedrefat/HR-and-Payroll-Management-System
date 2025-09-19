@@ -10,21 +10,19 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-{
-    Schema::create('leave_types', function (Blueprint $table) {
-        $table->id();
-        $table->string('leave_type');
-        $table->integer('days');
-        $table->timestamps();
-    });
-}
-
+    {
+        Schema::table('employee_salaries', function (Blueprint $table) {
+            $table->string('month_year')->nullable()->after('after_adjustment_salary');
+        });
+    }
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('leave_types');
+        Schema::table('employee_salaries', function (Blueprint $table) {
+            $table->dropColumn('month_year');
+        });
     }
 };
