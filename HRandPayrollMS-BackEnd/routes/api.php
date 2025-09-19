@@ -10,6 +10,7 @@ use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\SalaryStructureController;
 use App\Http\Controllers\EmployeeSalariesController;
+use App\Http\Controllers\IncrementController;
 
 
 //Route
@@ -68,3 +69,6 @@ Route::apiResource('salary-structures', SalaryStructureController::class);
 
 // Employee Salaries Routes
 Route::apiResource('employee-salaries', EmployeeSalariesController::class);
+
+// Increment Routes
+Route::apiResource('increments', IncrementController::class);
