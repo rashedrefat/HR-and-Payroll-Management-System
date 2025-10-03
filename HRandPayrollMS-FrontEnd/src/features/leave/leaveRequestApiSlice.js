@@ -49,6 +49,15 @@ export const leaveRequestApiSlice = apiSlice.injectEndpoints({
             invalidatesTags: ['LeaveRequest', 'MyLeaveRequest'],
         }),
 
+        // Admin delete leave request - can delete any leave request
+        adminDeleteLeaveRequest: builder.mutation({
+            query: (id) => ({
+                url: `/admin/leave-requests/${id}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: ['LeaveRequest', 'MyLeaveRequest'],
+        }),
+
         // Update leave request status (Admin only)
         updateLeaveRequestStatus: builder.mutation({
             query: ({ id, status }) => ({
@@ -67,5 +76,6 @@ export const {
     useCreateLeaveRequestMutation,
     useUpdateLeaveRequestMutation,
     useDeleteLeaveRequestMutation,
+    useAdminDeleteLeaveRequestMutation,
     useUpdateLeaveRequestStatusMutation,
 } = leaveRequestApiSlice;

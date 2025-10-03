@@ -61,6 +61,26 @@ class LeaveRequestController extends Controller
             'reason' => 'nullable|string|max:500',
         ]);
 
+        // Gender-based leave type validation
+        $leaveTypeLower = strtolower($validated['leave_type']);
+        $employeeGender = strtolower($employee->gender ?? '');
+
+        // Check if male employee is trying to apply for maternity leave
+        if ($employeeGender === 'male' && strpos($leaveTypeLower, 'maternity') !== false) {
+            return response()->json([
+                'error' => 'Male employees cannot apply for maternity leave',
+                'message' => 'This leave type is not available for your gender'
+            ], 422);
+        }
+
+        // Check if female employee is trying to apply for paternity leave
+        if ($employeeGender === 'female' && strpos($leaveTypeLower, 'paternity') !== false) {
+            return response()->json([
+                'error' => 'Female employees cannot apply for paternity leave',
+                'message' => 'This leave type is not available for your gender'
+            ], 422);
+        }
+
         $startDate = new \Carbon\Carbon($validated['start_date']);
         $endDate = new \Carbon\Carbon($validated['end_date']);
         $days = $startDate->diffInDays($endDate) + 1;
@@ -115,6 +135,26 @@ class LeaveRequestController extends Controller
             'reason' => 'nullable|string|max:500',
         ]);
 
+        // Gender-based leave type validation for updates
+        $leaveTypeLower = strtolower($validated['leave_type']);
+        $employeeGender = strtolower($employee->gender ?? '');
+
+        // Check if male employee is trying to update to maternity leave
+        if ($employeeGender === 'male' && strpos($leaveTypeLower, 'maternity') !== false) {
+            return response()->json([
+                'error' => 'Male employees cannot apply for maternity leave',
+                'message' => 'This leave type is not available for your gender'
+            ], 422);
+        }
+
+        // Check if female employee is trying to update to paternity leave
+        if ($employeeGender === 'female' && strpos($leaveTypeLower, 'paternity') !== false) {
+            return response()->json([
+                'error' => 'Female employees cannot apply for paternity leave',
+                'message' => 'This leave type is not available for your gender'
+            ], 422);
+        }
+
         $startDate = new \Carbon\Carbon($validated['start_date']);
         $endDate = new \Carbon\Carbon($validated['end_date']);
         $days = $startDate->diffInDays($endDate) + 1;
@@ -152,6 +192,15 @@ class LeaveRequestController extends Controller
             ->where('status', 'pending')
             ->firstOrFail();
 
+        $leaveRequest->delete();
+
+        return response()->json(['message' => 'Leave request deleted successfully']);
+    }
+
+    // Admin delete - can delete any leave request
+    public function adminDestroy($id)
+    {
+        $leaveRequest = LeaveRequest::findOrFail($id);
         $leaveRequest->delete();
 
         return response()->json(['message' => 'Leave request deleted successfully']);

@@ -8,21 +8,41 @@ import {
   useUpdateAttendanceMutation,
   useDeleteAttendanceMutation
 } from "../features/api/attendanceApiSlice";
+import { useGetShiftsQuery } from "../features/api/shiftApi";
+import { formatTimeForDisplay, formatTimeForInput, isValid12HourFormat, convertTimeInputToAPI } from "../utils/timeUtils";
+
+// Helper functions for automatic time selection
+const getCurrentTime12Hour = () => {
+  const now = new Date();
+  return now.toLocaleTimeString('en-US', { 
+    hour: 'numeric', 
+    minute: '2-digit',
+    hour12: true 
+  });
+};
+
+const getCommonTimes = () => [
+  '9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM',
+  '12:00 PM', '12:30 PM', '1:00 PM', '1:30 PM', '2:00 PM', '2:30 PM',
+  '3:00 PM', '3:30 PM', '4:00 PM', '4:30 PM', '5:00 PM', '5:30 PM',
+  '6:00 PM', '6:30 PM', '7:00 PM', '7:30 PM', '8:00 PM'
+];
 
 const tableLabels = [
-  { title: "Name", sort: true },
-  { title: "Employee ID", sort: true },
-  { title: "Check In Time", sort: true },
-  { title: "Check Out Time", sort: true },
-  { title: "Reason For Late", sort: false },
-  { title: "Date", sort: true },
-  { title: "Early Out Reason", sort: false },
+  { title: "Name", sort: true, field: "name" },
+  { title: "Employee ID", sort: true, field: "employeeId" },
+  { title: "Shift", sort: true, field: "shift" },
+  { title: "Check In Time", sort: true, field: "checkInTime" },
+  { title: "Check Out Time", sort: true, field: "checkOutTime" },
+  { title: "Status", sort: true, field: "status" },
+  { title: "Date", sort: true, field: "date" },
   { title: "Action", sort: false },
 ];
 
 export default function AttendanceList() {
   // API hooks
   const { data: rawAttendanceData = [], isLoading } = useGetAttendancesQuery();
+  const { data: shifts = [] } = useGetShiftsQuery();
   const [createAttendance] = useCreateAttendanceMutation();
   const [updateAttendance] = useUpdateAttendanceMutation();
   const [deleteAttendance] = useDeleteAttendanceMutation();
@@ -36,15 +56,21 @@ export default function AttendanceList() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [editingAttendance, setEditingAttendance] = useState(null);
   const [deleteAttendanceId, setDeleteAttendanceId] = useState(null);
-  const [newAttendance, setNewAttendance] = useState({
+  
+  // Sorting state
+  const [sortBy, setSortBy] = useState("date");
+  const [sortOrder, setSortOrder] = useState("desc"); // desc = newest first
+  // Initial state constant for consistency
+  const initialAttendanceState = {
     employeeName: '',
     employeeId: '',
+    shiftId: '',
     checkInTime: '',
     checkOutTime: '',
-    reasonForLate: '',
-    date: '',
-    earlyOutReason: ''
-  });
+    date: ''
+  };
+  
+  const [newAttendance, setNewAttendance] = useState(initialAttendanceState);
 
   // Transform API data to match the frontend structure
   const attendanceData = rawAttendanceData.map(attendance => ({
@@ -56,11 +82,17 @@ export default function AttendanceList() {
       id: attendance.id,
     },
     employeeId: attendance.employee_id,
-    checkInTime: attendance.check_in_time || "--",
-    checkOutTime: attendance.check_out_time || "--",
-    reasonForLate: attendance.reason_for_late || "None",
-    date: attendance.date,
-    earlyOutReason: attendance.early_out_reason || "None",
+    shift: attendance.shift?.shift_name || "No Shift",
+    shift_id: attendance.shift_id, // Add shift_id for editing
+    checkInTime: formatTimeForDisplay(attendance.check_in_time) || "--",
+    checkOutTime: formatTimeForDisplay(attendance.check_out_time) || "--",
+    status: {
+      isLate: attendance.is_late || false,
+      isEarlyOut: attendance.is_early_out || false,
+      lateMinutes: attendance.late_minutes || 0,
+      earlyOutMinutes: attendance.early_out_minutes || 0,
+    },
+    date: attendance.date ? attendance.date.split('T')[0] : '--',
   }));
 
   // Filter table data based on search term and date range
@@ -70,9 +102,7 @@ export default function AttendanceList() {
     // Text search filter
     const matchesSearch = !searchTerm || (
       attendance.name.title.toLowerCase().includes(searchLower) ||
-      attendance.employeeId.toLowerCase().includes(searchLower) ||
-      attendance.reasonForLate.toLowerCase().includes(searchLower) ||
-      attendance.earlyOutReason.toLowerCase().includes(searchLower)
+      attendance.employeeId.toLowerCase().includes(searchLower)
     );
 
     // Date range filter
@@ -90,6 +120,61 @@ export default function AttendanceList() {
     return matchesSearch && matchesDateRange && matchesSpecificDate;
   });
 
+  // Sorting function
+  const handleSort = (field) => {
+    if (sortBy === field) {
+      // Toggle sort order if same field
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      // Set new field and default to ascending
+      setSortBy(field);
+      setSortOrder("asc");
+    }
+  };
+
+  // Sort the filtered data
+  const sortedData = [...filteredData].sort((a, b) => {
+    let aValue, bValue;
+    
+    switch (sortBy) {
+      case "name":
+        aValue = a.name.title.toLowerCase();
+        bValue = b.name.title.toLowerCase();
+        break;
+      case "employeeId":
+        aValue = a.employeeId;
+        bValue = b.employeeId;
+        break;
+      case "shift":
+        aValue = a.shift.toLowerCase();
+        bValue = b.shift.toLowerCase();
+        break;
+      case "checkInTime":
+        // Convert time to sortable format (handle "--" cases)
+        aValue = a.checkInTime === "--" ? "99:99" : a.checkInTime;
+        bValue = b.checkInTime === "--" ? "99:99" : b.checkInTime;
+        break;
+      case "checkOutTime":
+        aValue = a.checkOutTime === "--" ? "99:99" : a.checkOutTime;
+        bValue = b.checkOutTime === "--" ? "99:99" : b.checkOutTime;
+        break;
+      case "status":
+        // Sort by late status first, then early out
+        aValue = a.status.isLate ? 2 : (a.status.isEarlyOut ? 1 : 0);
+        bValue = b.status.isLate ? 2 : (b.status.isEarlyOut ? 1 : 0);
+        break;
+      case "date":
+      default:
+        aValue = new Date(a.date || "1900-01-01");
+        bValue = new Date(b.date || "1900-01-01");
+        break;
+    }
+
+    if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
+    if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
+    return 0;
+  });
+
   const resetSelection = () => setSelect([]);
 
   const handleSelect = (item, e) => {
@@ -102,36 +187,33 @@ export default function AttendanceList() {
 
   const selectAll = (e) => {
     if (e.target.checked) {
-      setSelect(filteredData.map((data) => data.id));
+      setSelect(sortedData.map((data) => data.id));
     } else {
       resetSelection();
     }
   };
 
   const handleSearch = () => {
-    // The filtering is already applied automatically through the filteredData useMemo
+    // The filtering is already applied automatically through the sortedData
     // This function can be used for additional search actions if needed
     console.log("Searching with date range:", dateFrom, "to", dateTo);
     console.log("Search term:", searchTerm);
-    console.log("Filtered results:", filteredData.length, "records found");
+    console.log("Filtered and sorted results:", sortedData.length, "records found");
   };
 
   // Modal functions
   const handleAddAttendance = () => {
+    // Reset form state for new attendance
+    setNewAttendance({ ...initialAttendanceState });
+    setEditingAttendance(null); // Clear any editing state
     setShowAddModal(true);
   };
 
   const handleCloseModal = () => {
     setShowAddModal(false);
-    setNewAttendance({
-      employeeName: '',
-      employeeId: '',
-      checkInTime: '',
-      checkOutTime: '',
-      reasonForLate: 'None',
-      date: '',
-      earlyOutReason: 'None'
-    });
+    setShowEditModal(false);
+    setEditingAttendance(null);
+    setNewAttendance({ ...initialAttendanceState });
   };
 
   const handleInputChange = (e) => {
@@ -146,14 +228,24 @@ export default function AttendanceList() {
     e.preventDefault();
     
     try {
+      // Validate time formats
+      if (newAttendance.checkInTime && !isValid12HourFormat(newAttendance.checkInTime)) {
+        alert('Please enter check-in time in 12-hour format (e.g., 9:00 AM)');
+        return;
+      }
+      
+      if (newAttendance.checkOutTime && !isValid12HourFormat(newAttendance.checkOutTime)) {
+        alert('Please enter check-out time in 12-hour format (e.g., 5:00 PM)');
+        return;
+      }
+
       const attendanceData = {
         name: newAttendance.employeeName,
         employee_id: newAttendance.employeeId,
+        shift_id: newAttendance.shiftId || null,
         check_in_time: newAttendance.checkInTime || null,
         check_out_time: newAttendance.checkOutTime || null,
-        reason_for_late: newAttendance.reasonForLate || null,
         date: newAttendance.date,
-        early_out_reason: newAttendance.earlyOutReason || null,
       };
 
       await createAttendance(attendanceData).unwrap();
@@ -170,21 +262,46 @@ export default function AttendanceList() {
   const handleAttendanceEdit = (attendanceData) => {
     setEditingAttendance(attendanceData);
     
-    // Format times to H:i format (remove seconds if present)
-    const formatTime = (time) => {
-      if (!time || time === '--') return '';
-      // If time has seconds (H:i:s), remove them to get H:i
-      return time.length > 5 ? time.substring(0, 5) : time;
+
+    
+    // Format date to YYYY-MM-DD format for HTML date input
+    const formatDate = (date) => {
+      if (!date) return '';
+      // If date is already in YYYY-MM-DD format, return as is
+      if (typeof date === 'string' && date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        return date;
+      }
+      // If date includes time, extract just the date part
+      if (typeof date === 'string' && date.includes('T')) {
+        return date.split('T')[0];
+      }
+      // If date is in DD/MM/YYYY or MM/DD/YYYY format, convert
+      if (typeof date === 'string' && date.includes('/')) {
+        const parts = date.split('/');
+        if (parts.length === 3) {
+          // Assume DD/MM/YYYY format (adjust if needed)
+          return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+        }
+      }
+      // Try to parse as Date object
+      try {
+        const dateObj = new Date(date);
+        if (!isNaN(dateObj.getTime())) {
+          return dateObj.toISOString().split('T')[0];
+        }
+      } catch {
+        console.warn('Could not parse date:', date);
+      }
+      return date;
     };
     
     setNewAttendance({
       employeeName: attendanceData.name.title,
       employeeId: attendanceData.employeeId,
-      checkInTime: formatTime(attendanceData.checkInTime),
-      checkOutTime: formatTime(attendanceData.checkOutTime),
-      reasonForLate: attendanceData.reasonForLate === 'None' ? '' : attendanceData.reasonForLate,
-      date: attendanceData.date,
-      earlyOutReason: attendanceData.earlyOutReason === 'None' ? '' : attendanceData.earlyOutReason
+      shiftId: attendanceData.shift_id || '',
+      checkInTime: formatTimeForInput(attendanceData.checkInTime),
+      checkOutTime: formatTimeForInput(attendanceData.checkOutTime),
+      date: formatDate(attendanceData.date)
     });
     setShowEditModal(true);
   };
@@ -214,14 +331,24 @@ export default function AttendanceList() {
     e.preventDefault();
     
     try {
+      // Validate time formats
+      if (newAttendance.checkInTime && !isValid12HourFormat(newAttendance.checkInTime)) {
+        alert('Please enter check-in time in 12-hour format (e.g., 9:00 AM)');
+        return;
+      }
+      
+      if (newAttendance.checkOutTime && !isValid12HourFormat(newAttendance.checkOutTime)) {
+        alert('Please enter check-out time in 12-hour format (e.g., 5:00 PM)');
+        return;
+      }
+
       const attendanceData = {
         name: newAttendance.employeeName,
         employee_id: newAttendance.employeeId,
+        shift_id: newAttendance.shiftId || null,
         check_in_time: newAttendance.checkInTime || null,
         check_out_time: newAttendance.checkOutTime || null,
-        reason_for_late: newAttendance.reasonForLate || null,
         date: newAttendance.date,
-        early_out_reason: newAttendance.earlyOutReason || null,
       };
 
       console.log('Sending attendance data:', attendanceData);
@@ -234,15 +361,7 @@ export default function AttendanceList() {
       
       setShowEditModal(false);
       setEditingAttendance(null);
-      setNewAttendance({
-        employeeName: '',
-        employeeId: '',
-        checkInTime: '',
-        checkOutTime: '',
-        reasonForLate: '',
-        date: '',
-        earlyOutReason: ''
-      });
+      setNewAttendance({ ...initialAttendanceState });
     } catch (error) {
       console.error('Failed to update attendance:', error);
       
@@ -343,6 +462,117 @@ export default function AttendanceList() {
         </div>
       </div>
 
+      {/* Sorting Section */}
+      <div className="bg-white rounded-lg shadow p-4 mb-6">
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-gray-700">Sort by:</span>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
+            >
+              <option value="date">Date</option>
+              <option value="name">Name</option>
+              <option value="employeeId">Employee ID</option>
+              <option value="shift">Shift</option>
+              <option value="checkInTime">Check In Time</option>
+              <option value="checkOutTime">Check Out Time</option>
+              <option value="status">Status</option>
+            </select>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-gray-700">Order:</span>
+            <div className="flex bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => setSortOrder("asc")}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ${
+                  sortOrder === "asc" 
+                    ? "bg-white text-red-600 shadow-sm" 
+                    : "text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                ↑ Ascending
+              </button>
+              <button
+                onClick={() => setSortOrder("desc")}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ${
+                  sortOrder === "desc" 
+                    ? "bg-white text-red-600 shadow-sm" 
+                    : "text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                ↓ Descending
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 ml-auto">
+            <span className="text-sm text-gray-600">
+              Showing {sortedData.length} records
+            </span>
+            {(sortBy !== "date" || sortOrder !== "desc" || searchTerm || dateFrom || dateTo) ? (
+              <div className="flex gap-2">
+                {(sortBy !== "date" || sortOrder !== "desc") && (
+                  <button
+                    onClick={() => {
+                      setSortBy("date");
+                      setSortOrder("desc");
+                    }}
+                    className="px-3 py-1 text-xs bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300 transition-colors"
+                    title="Reset to default sort (Latest first)"
+                  >
+                    Reset Sort
+                  </button>
+                )}
+                {(searchTerm || dateFrom || dateTo) && (
+                  <button
+                    onClick={() => {
+                      setSearchTerm("");
+                      setDateFrom("");
+                      setDateTo("");
+                    }}
+                    className="px-3 py-1 text-xs bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors"
+                    title="Clear all filters"
+                  >
+                    Clear Filters
+                  </button>
+                )}
+              </div>
+            ) : null}
+          </div>
+        </div>
+        
+        {/* Quick Sort Buttons */}
+        {/* <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-200">
+          <span className="text-sm text-gray-600">Quick sorts:</span>
+          {[
+            { label: "Latest First", field: "date", order: "desc" },
+            { label: "Oldest First", field: "date", order: "asc" },
+            { label: "Name A-Z", field: "name", order: "asc" },
+            { label: "Name Z-A", field: "name", order: "desc" },
+            { label: "Early Check-in", field: "checkInTime", order: "asc" },
+            { label: "Late Check-in", field: "checkInTime", order: "desc" },
+          ].map((quickSort) => (
+            <button
+              key={`${quickSort.field}-${quickSort.order}`}
+              onClick={() => {
+                setSortBy(quickSort.field);
+                setSortOrder(quickSort.order);
+              }}
+              className={`px-2 py-1 text-xs rounded-md transition-colors ${
+                sortBy === quickSort.field && sortOrder === quickSort.order
+                  ? "bg-red-100 text-red-700 border border-red-200"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              {quickSort.label}
+            </button>
+          ))}
+        </div> */}
+      </div>
+
       {/* Export Button */}
       <div className="flex justify-end mb-4">
         <IconButton
@@ -355,6 +585,22 @@ export default function AttendanceList() {
         />
       </div>
 
+      {/* Current Sort Status */}
+      {/* <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+        <div className="flex items-center gap-2 text-sm text-blue-700">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />
+          </svg>
+          <span>
+            Currently sorted by <strong>{tableLabels.find(label => label.field === sortBy)?.title || sortBy}</strong> in{" "}
+            <strong>{sortOrder === "asc" ? "ascending" : "descending"}</strong> order
+          </span>
+          <span className="ml-auto text-blue-600">
+            {sortedData.length} {sortedData.length === 1 ? 'record' : 'records'} found
+          </span>
+        </div>
+      </div> */}
+
       <div className="bg-white rounded-lg shadow">
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
@@ -365,12 +611,15 @@ export default function AttendanceList() {
             selectAll={selectAll}
             selectRow={handleSelect}
             selectedData={select}
-            dataSet={filteredData.length}
+            dataSet={sortedData.length}
             tableLabels={tableLabels}
             itemsPerPage={10}
             resetSelection={resetSelection}
+            onSort={handleSort}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
           >
-            {filteredData.map((data) => (
+            {sortedData.map((data) => (
               <AttendanceListRow
                 key={data.id}
                 data={data}
@@ -385,7 +634,7 @@ export default function AttendanceList() {
       </div>
 
       {/* Add Attendance Modal */}
-      {showAddModal && (
+      {showAddModal && !editingAttendance && (
         <div className="fixed inset-0 backdrop-blur-md flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full m-4 max-h-[90vh] overflow-y-auto">
             <div className="p-6">
@@ -435,6 +684,29 @@ export default function AttendanceList() {
                     />
                   </div>
 
+                  {/* Shift Selection */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Shift
+                    </label>
+                    <select
+                      name="shiftId"
+                      value={newAttendance.shiftId}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    >
+                      <option value="">Select Shift (Optional)</option>
+                      {shifts.map((shift) => (
+                        <option key={shift.id} value={shift.id}>
+                          {shift.shift_name} ({shift.check_in} - {shift.check_out})
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Selecting a shift will automatically detect late arrivals and early departures
+                    </p>
+                  </div>
+
                   {/* Check In Time */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -443,11 +715,33 @@ export default function AttendanceList() {
                     <input
                       type="time"
                       name="checkInTime"
-                      value={newAttendance.checkInTime}
-                      onChange={handleInputChange}
+                      value={formatTimeForInput(newAttendance.checkInTime)}
+                      onChange={(e) => setNewAttendance({...newAttendance, checkInTime: convertTimeInputToAPI(e.target.value)})}
                       required
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                     />
+                    <div className="flex gap-2 mt-2">
+                      <button
+                        type="button"
+                        onClick={() => setNewAttendance({...newAttendance, checkInTime: getCurrentTime12Hour()})}
+                        className="px-2 py-1 text-xs bg-blue-100 text-blue-600 rounded hover:bg-blue-200"
+                      >
+                        Now
+                      </button>
+                      <select
+                        onChange={(e) => e.target.value && setNewAttendance({...newAttendance, checkInTime: e.target.value})}
+                        className="text-xs px-2 py-1 border rounded"
+                        value=""
+                      >
+                        <option value="">Quick Select</option>
+                        {getCommonTimes().map((time) => (
+                          <option key={time} value={time}>
+                            {time}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">Will be displayed as 12-hour format (AM/PM)</p>
                   </div>
 
                   {/* Check Out Time */}
@@ -458,11 +752,33 @@ export default function AttendanceList() {
                     <input
                       type="time"
                       name="checkOutTime"
-                      value={newAttendance.checkOutTime}
-                      onChange={handleInputChange}
+                      value={formatTimeForInput(newAttendance.checkOutTime)}
+                      onChange={(e) => setNewAttendance({...newAttendance, checkOutTime: convertTimeInputToAPI(e.target.value)})}
                       required
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                     />
+                    <div className="flex gap-2 mt-2">
+                      <button
+                        type="button"
+                        onClick={() => setNewAttendance({...newAttendance, checkOutTime: getCurrentTime12Hour()})}
+                        className="px-2 py-1 text-xs bg-blue-100 text-blue-600 rounded hover:bg-blue-200"
+                      >
+                        Now
+                      </button>
+                      <select
+                        onChange={(e) => e.target.value && setNewAttendance({...newAttendance, checkOutTime: e.target.value})}
+                        className="text-xs px-2 py-1 border rounded"
+                        value=""
+                      >
+                        <option value="">Quick Select</option>
+                        {getCommonTimes().map((time) => (
+                          <option key={time} value={time}>
+                            {time}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">Will be displayed as 12-hour format (AM/PM)</p>
                   </div>
 
                   {/* Date */}
@@ -480,48 +796,6 @@ export default function AttendanceList() {
                     />
                   </div>
 
-                  {/* Reason For Late */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Reason For Late
-                    </label>
-                    <select
-                      name="reasonForLate"
-                      value={newAttendance.reasonForLate}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    >
-                      <option value="None">None</option>
-                      <option value="Traffic Jam">Traffic Jam</option>
-                      <option value="Medical Appointment">Medical Appointment</option>
-                      <option value="Personal Emergency">Personal Emergency</option>
-                      <option value="Public Transport Delay">Public Transport Delay</option>
-                      <option value="Gone To Hospital">Gone To Hospital</option>
-                      <option value="Family Emergency">Family Emergency</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Early Out Reason */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Early Out Reason
-                  </label>
-                  <select
-                    name="earlyOutReason"
-                    value={newAttendance.earlyOutReason}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  >
-                    <option value="None">None</option>
-                    <option value="Family Emergency">Family Emergency</option>
-                    <option value="Medical Appointment">Medical Appointment</option>
-                    <option value="Personal Emergency">Personal Emergency</option>
-                    <option value="Approved Leave">Approved Leave</option>
-                    <option value="Official Work">Official Work</option>
-                    <option value="Other">Other</option>
-                  </select>
                 </div>
 
                 {/* Action Buttons */}
@@ -547,7 +821,7 @@ export default function AttendanceList() {
       )}
 
       {/* Edit Attendance Modal */}
-      {showEditModal && (
+      {showEditModal && editingAttendance && (
         <div className="fixed inset-0 backdrop-blur-md flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full m-4 max-h-[90vh] overflow-y-auto">
             <div className="p-6">
@@ -593,15 +867,58 @@ export default function AttendanceList() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Shift
+                    </label>
+                    <select
+                      value={newAttendance.shiftId}
+                      onChange={(e) => setNewAttendance({...newAttendance, shiftId: e.target.value})}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
+                    >
+                      <option value="">Select Shift (Optional)</option>
+                      {shifts.map((shift) => (
+                        <option key={shift.id} value={shift.id}>
+                          {shift.shift_name} ({shift.check_in} - {shift.check_out})
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Selecting a shift will automatically detect late arrivals and early departures
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       Check In Time *
                     </label>
                     <input
                       type="time"
-                      value={newAttendance.checkInTime}
-                      onChange={(e) => setNewAttendance({...newAttendance, checkInTime: e.target.value})}
+                      value={formatTimeForInput(newAttendance.checkInTime)}
+                      onChange={(e) => setNewAttendance({...newAttendance, checkInTime: convertTimeInputToAPI(e.target.value)})}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
                       required
                     />
+                    <div className="flex gap-2 mt-2">
+                      <button
+                        type="button"
+                        onClick={() => setNewAttendance({...newAttendance, checkInTime: getCurrentTime12Hour()})}
+                        className="px-2 py-1 text-xs bg-blue-100 text-blue-600 rounded hover:bg-blue-200"
+                      >
+                        Now
+                      </button>
+                      <select
+                        onChange={(e) => e.target.value && setNewAttendance({...newAttendance, checkInTime: e.target.value})}
+                        className="text-xs px-2 py-1 border rounded"
+                        value=""
+                      >
+                        <option value="">Quick Select</option>
+                        {getCommonTimes().map((time) => (
+                          <option key={time} value={time}>
+                            {time}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">Select time using the picker - will be saved as 12-hour format</p>
                   </div>
 
                   <div>
@@ -610,10 +927,32 @@ export default function AttendanceList() {
                     </label>
                     <input
                       type="time"
-                      value={newAttendance.checkOutTime}
-                      onChange={(e) => setNewAttendance({...newAttendance, checkOutTime: e.target.value})}
+                      value={formatTimeForInput(newAttendance.checkOutTime)}
+                      onChange={(e) => setNewAttendance({...newAttendance, checkOutTime: convertTimeInputToAPI(e.target.value)})}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
                     />
+                    <div className="flex gap-2 mt-2">
+                      <button
+                        type="button"
+                        onClick={() => setNewAttendance({...newAttendance, checkOutTime: getCurrentTime12Hour()})}
+                        className="px-2 py-1 text-xs bg-blue-100 text-blue-600 rounded hover:bg-blue-200"
+                      >
+                        Now
+                      </button>
+                      <select
+                        onChange={(e) => e.target.value && setNewAttendance({...newAttendance, checkOutTime: e.target.value})}
+                        className="text-xs px-2 py-1 border rounded"
+                        value=""
+                      >
+                        <option value="">Quick Select</option>
+                        {getCommonTimes().map((time) => (
+                          <option key={time} value={time}>
+                            {time}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">Select time using the picker - will be saved as 12-hour format</p>
                   </div>
 
                   <div>
@@ -629,31 +968,7 @@ export default function AttendanceList() {
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Reason for Late
-                    </label>
-                    <input
-                      type="text"
-                      value={newAttendance.reasonForLate}
-                      onChange={(e) => setNewAttendance({...newAttendance, reasonForLate: e.target.value})}
-                      placeholder="Enter reason if applicable"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
-                    />
-                  </div>
 
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Early Out Reason
-                    </label>
-                    <input
-                      type="text"
-                      value={newAttendance.earlyOutReason}
-                      onChange={(e) => setNewAttendance({...newAttendance, earlyOutReason: e.target.value})}
-                      placeholder="Enter reason if applicable"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
-                    />
-                  </div>
                 </div>
 
                 <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">

@@ -39,23 +39,35 @@ export default function AttendanceListRow({ selectRow, selectedData, data, onEdi
         <span className="text-gray-600 font-medium">{data.employeeId}</span>
       </TableData>
       <TableData>
+        <span className="text-blue-600 font-medium text-sm">{data.shift}</span>
+      </TableData>
+      <TableData>
         <span className="text-green-600 font-medium">{data.checkInTime}</span>
       </TableData>
       <TableData>
         <span className="text-red-600 font-medium">{data.checkOutTime}</span>
       </TableData>
       <TableData>
-        <span className={`${data.reasonForLate === "None" ? "text-green-600" : "text-orange-600"} text-sm`}>
-          {data.reasonForLate}
-        </span>
+        <div className="flex flex-col space-y-1">
+          {data.status?.isLate && (
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+              Late ({data.status.lateMinutes} min)
+            </span>
+          )}
+          {data.status?.isEarlyOut && (
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+              Early Out ({data.status.earlyOutMinutes} min)
+            </span>
+          )}
+          {!data.status?.isLate && !data.status?.isEarlyOut && (
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+              On Time
+            </span>
+          )}
+        </div>
       </TableData>
       <TableData>
         <span className="text-gray-600">{new Date(data.date).toLocaleDateString('en-GB')}</span>
-      </TableData>
-      <TableData>
-        <span className={`${data.earlyOutReason === "None" ? "text-green-600" : "text-orange-600"} text-sm`}>
-          {data.earlyOutReason}
-        </span>
       </TableData>
       <TableData>
         <div className="flex items-center gap-3 justify-center">

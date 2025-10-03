@@ -68,20 +68,6 @@ export default function SalaryListRow({ data, onEdit, onDelete }) {
       </SalaryListTd>
       
       <SalaryListTd className="text-center">
-        <span className={`font-semibold ${data.adjustmentAmount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-          {data.adjustmentAmount >= 0 ? '+' : ''}{formatCurrency(data.adjustmentAmount)}
-        </span>
-      </SalaryListTd>
-      
-      <SalaryListTd className="text-center">
-        <span className="text-sm text-gray-600">{data.adjustmentReason}</span>
-      </SalaryListTd>
-      
-      <SalaryListTd className="text-center font-bold text-gray-900">
-        {formatCurrency(data.afterAdjustmentSalary)}
-      </SalaryListTd>
-      
-      <SalaryListTd className="text-center">
         <span className={getStatusColor(data.status)}>
           {data.status}
         </span>

@@ -34,6 +34,13 @@ function EmployeeAttendanceRow({ data, onEdit, onDelete }) {
           <span className="text-sm text-gray-700 font-medium">{data.employeeId}</span>
         </EmployeeAttendanceTd>
 
+        {/* Shift */}
+        <EmployeeAttendanceTd>
+          <span className="text-sm text-blue-600 font-medium bg-blue-50 px-2 py-1 rounded-full">
+            {data.shift}
+          </span>
+        </EmployeeAttendanceTd>
+
         {/* Check-In Time */}
         <EmployeeAttendanceTd>
           <span className="text-sm text-gray-700 font-medium">{data.checkInTime}</span>
@@ -44,23 +51,35 @@ function EmployeeAttendanceRow({ data, onEdit, onDelete }) {
           <span className="text-sm text-gray-700 font-medium">{data.checkOutTime}</span>
         </EmployeeAttendanceTd>
 
-        {/* Reason For Late */}
+        {/* Status */}
         <EmployeeAttendanceTd>
-          <span className={`text-sm ${data.reasonForLate === "--" ? "text-gray-400" : "text-red-600 font-medium"}`}>
-            {data.reasonForLate}
-          </span>
+          <div className="flex items-center space-x-2">
+            {data.status?.isLate && (
+              <span className="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">
+                Late {data.status.lateMinutes}min
+              </span>
+            )}
+            {data.status?.isEarlyOut && (
+              <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">
+                Early {data.status.earlyOutMinutes}min
+              </span>
+            )}
+            {!data.status?.isLate && !data.status?.isEarlyOut && data.checkInTime !== "--" && (
+              <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                On Time
+              </span>
+            )}
+            {data.checkInTime === "--" && (
+              <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded-full">
+                Absent
+              </span>
+            )}
+          </div>
         </EmployeeAttendanceTd>
 
         {/* Date */}
         <EmployeeAttendanceTd>
           <div className="text-sm font-medium text-gray-900">{data.date}</div>
-        </EmployeeAttendanceTd>
-
-        {/* Early Out Reason */}
-        <EmployeeAttendanceTd>
-          <span className={`text-sm ${data.earlyOutReason === "--" ? "text-gray-400" : "text-blue-600 font-medium"}`}>
-            {data.earlyOutReason}
-          </span>
         </EmployeeAttendanceTd>
 
         {/* Actions */}

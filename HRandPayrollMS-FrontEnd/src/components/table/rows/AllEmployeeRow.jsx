@@ -64,6 +64,9 @@ export default function AllEmployeeRow({ selectRow, selectedData, data, updateEm
         <span className="text-gray-600">{data.mobile}</span>
       </TableData>
       <TableData>
+        <span className="text-gray-600 capitalize">{data.gender}</span>
+      </TableData>
+      <TableData>
         <span className="text-gray-600">{data.department}</span>
       </TableData>
       <TableData>

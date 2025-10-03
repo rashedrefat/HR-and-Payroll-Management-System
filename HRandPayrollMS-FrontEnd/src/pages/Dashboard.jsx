@@ -1,11 +1,76 @@
 import DashboardStats from "../components/dashboard/DashboardStats";
 import AttendanceBarChart from "../components/charts/AttendanceBarChart";
 import DepartmentPieChart from "../components/charts/DepartmentPieChart";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useGetEmployeesQuery } from "../features/api/employeeApiSlice";
+import { useGetAttendancesQuery } from "../features/api/attendanceApiSlice";
+import { useGetEmployeeSalariesQuery } from "../features/api/employeeSalariesApiSlice";
 
 export default function Dashboard() {
   const [showEmployeesModal, setShowEmployeesModal] = useState(false);
   const [showActivitiesModal, setShowActivitiesModal] = useState(false);
+  
+  // API hooks to fetch real data
+  const { data: employees = [], isLoading: employeesLoading, error: employeesError } = useGetEmployeesQuery();
+  const { data: attendances = [], isLoading: attendancesLoading, error: attendancesError } = useGetAttendancesQuery();
+  const { data: employeeSalaries = [], isLoading: salariesLoading, error: salariesError } = useGetEmployeeSalariesQuery();
+
+  // Calculate dashboard statistics from real data
+  const dashboardStats = useMemo(() => {
+    const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+    const currentMonth = new Date().getMonth() + 1; // Get current month (1-12)
+    const currentYear = new Date().getFullYear();
+
+    // Total Employees (active employees only)  
+    const totalEmployees = employees.filter(emp => emp.status === true || emp.status === 1).length;
+
+    // Today's attendance calculations
+    const todayAttendance = attendances.filter(att => {
+      const attendanceDate = att.date ? att.date.split('T')[0] : '';
+      return attendanceDate === today;
+    });
+
+    const todayPresent = todayAttendance.filter(att => 
+      att.check_in_time && att.check_in_time !== '--'
+    ).length;
+    
+    const todayAbsent = totalEmployees - todayPresent;
+
+    // Monthly payroll calculation
+    const monthlyPayrollData = employeeSalaries.filter(salary => {
+      if (!salary.monthYear) return false;
+      try {
+        const [month, year] = salary.monthYear.split('-');
+        return parseInt(month) === currentMonth && parseInt(year) === currentYear;
+      } catch (error) {
+        console.warn('Invalid monthYear format:', salary.monthYear, error);
+        return false;
+      }
+    });
+
+    const monthlyPayrollTotal = monthlyPayrollData.reduce((total, salary) => {
+      try {
+        const salaryAmount = parseFloat(salary.after_adjustment_salary || salary.salary || 0);
+        return total + (isNaN(salaryAmount) ? 0 : salaryAmount);
+      } catch (error) {
+        console.warn('Invalid salary amount:', salary, error);
+        return total;
+      }
+    }, 0);
+
+    return {
+      totalEmployees,
+      todayPresent,
+      todayAbsent,
+      monthlyPayrollTotal
+    };
+  }, [employees, attendances, employeeSalaries]);
+
+  // Loading state
+  const isLoading = employeesLoading || attendancesLoading || salariesLoading;
+  
+  // Error state
+  const hasError = employeesError || attendancesError || salariesError;
   // Sample data for the new sections
   const quickActions = [
     {
@@ -31,8 +96,8 @@ export default function Dashboard() {
       action: () => console.log("Process Payroll clicked")
     },
     {
-      title: "Schedule Review",
-      description: "Plan performance reviews",
+      title: "Shift Information",
+      description: "View and manage shift schedules",
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -325,12 +390,40 @@ export default function Dashboard() {
       </div>
 
       <div className="space-y-6">
-        <DashboardStats 
-          totalEmployees={125} 
-          todayPresent={98} 
-          todayAbsent={27} 
-          monthlyPayroll={<><span className="font-black">৳</span>24,50,000</>} 
-        />
+        {hasError ? (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-center">
+              <svg className="w-5 h-5 text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+              <p className="text-red-800 font-medium">Error loading dashboard data</p>
+            </div>
+            <p className="text-red-600 text-sm mt-1">Please try refreshing the page or contact support if the problem persists.</p>
+          </div>
+        ) : isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 animate-pulse">
+                <div className="flex justify-between items-center">
+                  <div className="flex-1">
+                    <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
+                    <div className="h-8 bg-gray-200 rounded w-16"></div>
+                  </div>
+                  <div className="w-14 h-14 bg-gray-200 rounded-xl"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <DashboardStats 
+            totalEmployees={dashboardStats.totalEmployees} 
+            todayPresent={dashboardStats.todayPresent} 
+            todayAbsent={dashboardStats.todayAbsent} 
+            monthlyPayroll={
+              <><span className="font-black">৳</span>{dashboardStats.monthlyPayrollTotal.toLocaleString('en-BD')}</>
+            } 
+          />
+        )}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <AttendanceBarChart />

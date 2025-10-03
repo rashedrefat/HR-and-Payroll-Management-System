@@ -9,6 +9,7 @@ import ShiftSettingsRow from "../components/table/rows/ShiftSettingsRow";
 import Modal from "../components/Modal/Modal";
 import { useAddShiftMutation, useUpdateShiftMutation, useDeleteShiftMutation } from "../features/api/shiftApi";
 import toast from "react-hot-toast";
+import { formatTimeForDisplay, formatTimeForInput, convertTimeInputToAPI, isValid12HourFormat } from "../utils/timeUtils";
 
 
 export default function ShiftSettings() {
@@ -52,8 +53,8 @@ export default function ShiftSettings() {
     setNewShift({
       shift_name: shift.shift_name,
       type: shift.type || '',
-      check_in: shift.check_in,
-      check_out: shift.check_out,
+      check_in: formatTimeForInput(shift.check_in),
+      check_out: formatTimeForInput(shift.check_out),
       grace_time: shift.grace_time,
       working_days: Array.isArray(shift.working_days) ? shift.working_days : [],
       weekends: Array.isArray(shift.weekends) ? shift.weekends : [],
@@ -101,6 +102,17 @@ export default function ShiftSettings() {
   const handleSubmitAdd = async (e) => {
     e.preventDefault();
     try {
+      // Validate time formats
+      if (!isValid12HourFormat(newShift.check_in)) {
+        toast.error('Please enter check-in time in 12-hour format (e.g., 9:00 AM)');
+        return;
+      }
+      
+      if (!isValid12HourFormat(newShift.check_out)) {
+        toast.error('Please enter check-out time in 12-hour format (e.g., 5:00 PM)');
+        return;
+      }
+
       await addShift(newShift).unwrap();
       toast.success("Shift added successfully");
       handleCloseModal();
@@ -112,12 +124,20 @@ export default function ShiftSettings() {
   const handleSubmitEdit = async (e) => {
     e.preventDefault();
     console.log('Edit Modal Save Clicked');
+    
+    // Validate time formats
+    if (!isValid12HourFormat(newShift.check_in)) {
+      toast.error('Please enter check-in time in 12-hour format (e.g., 9:00 AM)');
+      return;
+    }
+    
+    if (!isValid12HourFormat(newShift.check_out)) {
+      toast.error('Please enter check-out time in 12-hour format (e.g., 5:00 PM)');
+      return;
+    }
+
     // Exclude 'id' from the update payload, only pass it as a separate param
     const { id, ...updateFields } = { id: editingShift?.id, ...newShift };
-    // Format check_in and check_out to HH:mm
-    const formatTime = (t) => t ? t.slice(0,5) : '';
-    updateFields.check_in = formatTime(updateFields.check_in);
-    updateFields.check_out = formatTime(updateFields.check_out);
     console.log('Payload (without id in body):', updateFields, 'id:', id);
     try {
       const result = await updateShift({ id, ...updateFields });
@@ -218,8 +238,8 @@ export default function ShiftSettings() {
                       id: shift.id,
                       shiftName: shift.shift_name,
                       shiftType: shift.type || "",
-                      checkInTime: shift.check_in,
-                      checkOutTime: shift.check_out,
+                      checkInTime: formatTimeForDisplay(shift.check_in),
+                      checkOutTime: formatTimeForDisplay(shift.check_out),
                       graceTime: `${shift.grace_time} minutes`,
                       workingDays: Array.isArray(shift.working_days) ? shift.working_days.join(", ") : shift.working_days,
                       weekends: Array.isArray(shift.weekends) ? shift.weekends.join(", ") : shift.weekends,
@@ -268,22 +288,24 @@ export default function ShiftSettings() {
                 <input
                   type="time"
                   name="check_in"
-                  value={newShift.check_in}
-                  onChange={handleInputChange}
+                  value={formatTimeForInput(newShift.check_in)}
+                  onChange={(e) => setNewShift({...newShift, check_in: convertTimeInputToAPI(e.target.value)})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   required
                 />
+                <p className="text-xs text-gray-500 mt-1">Select time using the picker - will be saved as 12-hour format</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Check Out *</label>
                 <input
                   type="time"
                   name="check_out"
-                  value={newShift.check_out}
-                  onChange={handleInputChange}
+                  value={formatTimeForInput(newShift.check_out)}
+                  onChange={(e) => setNewShift({...newShift, check_out: convertTimeInputToAPI(e.target.value)})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   required
                 />
+                <p className="text-xs text-gray-500 mt-1">Select time using the picker - will be saved as 12-hour format</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Grace Time (minutes)</label>
@@ -381,22 +403,24 @@ export default function ShiftSettings() {
                 <input
                   type="time"
                   name="check_in"
-                  value={newShift.check_in}
-                  onChange={handleInputChange}
+                  value={formatTimeForInput(newShift.check_in)}
+                  onChange={(e) => setNewShift({...newShift, check_in: convertTimeInputToAPI(e.target.value)})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   required
                 />
+                <p className="text-xs text-gray-500 mt-1">Select time using the picker - will be saved as 12-hour format</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Check Out *</label>
                 <input
                   type="time"
                   name="check_out"
-                  value={newShift.check_out}
-                  onChange={handleInputChange}
+                  value={formatTimeForInput(newShift.check_out)}
+                  onChange={(e) => setNewShift({...newShift, check_out: convertTimeInputToAPI(e.target.value)})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   required
                 />
+                <p className="text-xs text-gray-500 mt-1">Select time using the picker - will be saved as 12-hour format</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Grace Time (minutes)</label>

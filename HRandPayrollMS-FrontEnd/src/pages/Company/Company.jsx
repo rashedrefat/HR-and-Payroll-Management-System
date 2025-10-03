@@ -30,8 +30,13 @@ const Company = () => {
     website: "",
     email: "",
     phone: "",
-    description: ""
+    description: "",
+    logo: ""
   });
+
+  // State for logo file handling
+  const [logoFile, setLogoFile] = useState(null);
+  const [logoPreview, setLogoPreview] = useState("");
 
   const [hrInfo, setHrInfo] = useState({
     name: "",
@@ -61,8 +66,12 @@ const Company = () => {
         website: company.website || "",
         email: company.email || "",
         phone: company.phone || "",
-        description: company.description || ""
+        description: company.description || "",
+        logo: company.logo || ""
       });
+
+      // Set logo preview
+      setLogoPreview(company.logo || "/images/smarthrlogo.png");
 
       setHrInfo({
         name: hr.name || "",
@@ -84,6 +93,27 @@ const Company = () => {
       ...prev,
       [field]: value
     }));
+  };
+
+  const handleLogoChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setLogoFile(file);
+      
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setLogoPreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditingCompany(false);
+    setLogoFile(null);
+    // Reset logo preview to original
+    setLogoPreview(companyInfo.logo || "/images/smarthrlogo.png");
   };
 
   const handleHREdit = (field, value) => {
@@ -116,22 +146,32 @@ const Company = () => {
 
   const handleSaveCompany = async () => {
     try {
-      const result = await updateCompanyInfo({
-        name: companyInfo.name,
-        companyType: companyInfo.companyType,
-        established: parseInt(companyInfo.established) || null,
-        employees: parseInt(companyInfo.employees) || null,
-        location: companyInfo.location,
-        website: companyInfo.website,
-        phone: companyInfo.phone,
-        email: companyInfo.email,
-        industry: companyInfo.industry,
-        description: companyInfo.description
-      }).unwrap();
+      // Create FormData for handling file upload
+      const formData = new FormData();
+      
+      // Append company data
+      formData.append('name', companyInfo.name);
+      formData.append('companyType', companyInfo.companyType);
+      formData.append('established', parseInt(companyInfo.established) || '');
+      formData.append('employees', parseInt(companyInfo.employees) || '');
+      formData.append('location', companyInfo.location);
+      formData.append('website', companyInfo.website);
+      formData.append('phone', companyInfo.phone);
+      formData.append('email', companyInfo.email);
+      formData.append('industry', companyInfo.industry);
+      formData.append('description', companyInfo.description);
+      
+      // Append logo file if selected
+      if (logoFile) {
+        formData.append('logo', logoFile);
+      }
+
+      const result = await updateCompanyInfo(formData).unwrap();
 
       if (result.success) {
         toast.success('Company information updated successfully!');
         setIsEditingCompany(false);
+        setLogoFile(null); // Reset logo file
         refetch();
       }
     } catch (error) {
@@ -168,21 +208,27 @@ const Company = () => {
     e.preventDefault();
     const formData = new FormData(e.target);
     
-    const newCompany = {
-      name: formData.get('companyName'),
-      companyType: formData.get('companyType'),
-      established: parseInt(formData.get('established')) || null,
-      employees: parseInt(formData.get('employees')) || null,
-      location: formData.get('location'),
-      website: formData.get('website'),
-      email: formData.get('email'),
-      phone: formData.get('phone'),
-      industry: formData.get('industry'),
-      description: formData.get('description')
-    };
+    // Create a new FormData object with all the form data
+    const companyFormData = new FormData();
+    companyFormData.append('name', formData.get('companyName'));
+    companyFormData.append('companyType', formData.get('companyType'));
+    companyFormData.append('established', parseInt(formData.get('established')) || '');
+    companyFormData.append('employees', parseInt(formData.get('employees')) || '');
+    companyFormData.append('location', formData.get('location'));
+    companyFormData.append('website', formData.get('website'));
+    companyFormData.append('email', formData.get('email'));
+    companyFormData.append('phone', formData.get('phone'));
+    companyFormData.append('industry', formData.get('industry'));
+    companyFormData.append('description', formData.get('description'));
+    
+    // Append logo file if provided
+    const logoFile = formData.get('logo');
+    if (logoFile && logoFile.size > 0) {
+      companyFormData.append('logo', logoFile);
+    }
 
     try {
-      const result = await updateCompanyInfo(newCompany).unwrap();
+      const result = await updateCompanyInfo(companyFormData).unwrap();
       if (result.success) {
         toast.success('Company information added successfully!');
         setShowAddCompanyModal(false);
@@ -310,13 +356,33 @@ const Company = () => {
                   <div className="flex justify-between items-start mb-6">
                     <div className="flex-1">
                       <div className="text-center">
-                        <div className="w-24 h-24 mx-auto mb-4 bg-white rounded-2xl flex items-center justify-center shadow-lg border-2 border-gray-200">
+                        <div className="relative w-24 h-24 mx-auto mb-4 bg-white rounded-2xl flex items-center justify-center shadow-lg border-2 border-gray-200">
                           <img 
-                            src="/images/smarthrlogo.png" 
-                            alt="SmartHR Solutions Logo" 
+                            src={logoPreview || "/images/smarthrlogo.png"} 
+                            alt="Company Logo" 
                             className="w-20 h-20 object-contain"
                           />
+                          {isEditingCompany && (
+                            <>
+                              <div className="absolute inset-0 bg-black bg-opacity-50 rounded-2xl flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-200 cursor-pointer">
+                                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                              </div>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleLogoChange}
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                title="Click to change logo"
+                              />
+                            </>
+                          )}
                         </div>
+                        {isEditingCompany && (
+                          <p className="text-xs text-gray-500 mb-2">Click logo to change</p>
+                        )}
                         {isEditingCompany ? (
                           <input
                             type="text"
@@ -339,28 +405,41 @@ const Company = () => {
                         )}
                       </div>
                     </div>
-                    <button
-                      onClick={() => {
-                        if (isEditingCompany) {
-                          handleSaveCompany();
-                        } else {
-                          setIsEditingCompany(true);
-                        }
-                      }}
-                      className="ml-2 p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200"
-                      title={isEditingCompany ? "Save changes" : "Edit company info"}
-                      disabled={isUpdatingCompany}
-                    >
-                      {isEditingCompany ? (
-                        <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                      ) : (
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
+                    <div className="flex space-x-1">
+                      {isEditingCompany && (
+                        <button
+                          onClick={handleCancelEdit}
+                          className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200"
+                          title="Cancel changes"
+                        >
+                          <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
                       )}
-                    </button>
+                      <button
+                        onClick={() => {
+                          if (isEditingCompany) {
+                            handleSaveCompany();
+                          } else {
+                            setIsEditingCompany(true);
+                          }
+                        }}
+                        className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all duration-200"
+                        title={isEditingCompany ? "Save changes" : "Edit company info"}
+                        disabled={isUpdatingCompany}
+                      >
+                        {isEditingCompany ? (
+                          <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        ) : (
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
                   </div>
 
                   <div className="space-y-4">
@@ -412,19 +491,29 @@ const Company = () => {
                 <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8 transition-all duration-300 hover:shadow-2xl hover:scale-102 hover:-translate-y-1 cursor-pointer">
                   <div className="flex justify-between items-center mb-6">
                     <h3 className="text-xl font-bold text-gray-900">Company Details</h3>
-                    <button
-                      onClick={() => {
-                        if (isEditingCompany) {
-                          handleSaveCompany();
-                        } else {
-                          setIsEditingCompany(true);
-                        }
-                      }}
-                      className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-all duration-200 disabled:opacity-50"
-                      disabled={isUpdatingCompany}
-                    >
-                      {isEditingCompany ? (isUpdatingCompany ? 'Saving...' : 'Save Changes') : 'Edit Details'}
-                    </button>
+                    <div className="flex space-x-2">
+                      {isEditingCompany && (
+                        <button
+                          onClick={handleCancelEdit}
+                          className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-all duration-200"
+                        >
+                          Cancel
+                        </button>
+                      )}
+                      <button
+                        onClick={() => {
+                          if (isEditingCompany) {
+                            handleSaveCompany();
+                          } else {
+                            setIsEditingCompany(true);
+                          }
+                        }}
+                        className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-all duration-200 disabled:opacity-50"
+                        disabled={isUpdatingCompany}
+                      >
+                        {isEditingCompany ? (isUpdatingCompany ? 'Saving...' : 'Save Changes') : 'Edit Details'}
+                      </button>
+                    </div>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -975,6 +1064,19 @@ const Company = () => {
                       placeholder="Enter phone number"
                     />
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Company Logo
+                  </label>
+                  <input
+                    type="file"
+                    name="logo"
+                    accept="image/*"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-red-50 file:text-red-700 hover:file:bg-red-100"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Upload company logo (JPG, PNG, GIF - Max 2MB)</p>
                 </div>
 
                 <div>

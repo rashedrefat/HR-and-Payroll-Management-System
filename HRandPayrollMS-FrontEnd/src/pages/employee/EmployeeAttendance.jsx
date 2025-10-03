@@ -7,21 +7,24 @@ import {
   useUpdateMyAttendanceMutation,
   useDeleteMyAttendanceMutation
 } from "../../features/api/attendanceApiSlice";
+import { useGetShiftsQuery } from "../../features/api/shiftApi";
+import { formatTimeForDisplay, formatTimeForInput, convertTimeInputToAPI, isValid12HourFormat } from "../../utils/timeUtils";
 
 const tableLabels = [
   { title: "Name", sort: true },
   { title: "Employee ID", sort: true },
+  { title: "Shift", sort: true },
   { title: "Check-In Time", sort: true },
   { title: "Check-Out Time", sort: true },
-  { title: "Reason For Late", sort: false },
+  { title: "Status", sort: true },
   { title: "Date", sort: true },
-  { title: "Early Out Reason", sort: false },
   { title: "Actions", sort: false },
 ];
 
 export default function EmployeeAttendance() {
   // API hooks
   const { data: attendanceData = [], isLoading } = useGetMyAttendancesQuery();
+  const { data: shifts = [] } = useGetShiftsQuery();
   const [createAttendance] = useCreateMyAttendanceMutation();
   const [updateAttendance] = useUpdateMyAttendanceMutation();
   const [deleteAttendance] = useDeleteMyAttendanceMutation();
@@ -32,9 +35,8 @@ export default function EmployeeAttendance() {
   const [newAttendance, setNewAttendance] = useState({
     checkInTime: "",
     checkOutTime: "",
-    reasonForLate: "",
     date: "",
-    earlyOutReason: "",
+    shiftId: "",
   });
 
   // Transform API data for frontend compatibility
@@ -42,16 +44,20 @@ export default function EmployeeAttendance() {
     id: record.id,
     name: record.name,
     employeeId: record.employee_id,
-    checkInTime: record.check_in_time || "--",
-    checkOutTime: record.check_out_time || "--",
-    reasonForLate: record.reason_for_late || "--",
-    date: record.date,
-    earlyOutReason: record.early_out_reason || "--",
+    shift: record.shift?.shift_name || "No Shift",
+    checkInTime: formatTimeForDisplay(record.check_in_time) || "--",
+    checkOutTime: formatTimeForDisplay(record.check_out_time) || "--",
+    status: {
+      isLate: record.is_late || false,
+      isEarlyOut: record.is_early_out || false,
+      lateMinutes: record.late_minutes || 0,
+      earlyOutMinutes: record.early_out_minutes || 0,
+    },
+    date: record.date ? record.date.split('T')[0] : '--',
     // Keep original API fields for editing
     check_in_time: record.check_in_time,
     check_out_time: record.check_out_time,
-    reason_for_late: record.reason_for_late,
-    early_out_reason: record.early_out_reason,
+    shift_id: record.shift_id,
   }));
 
   // Filter data based on search
@@ -68,19 +74,30 @@ export default function EmployeeAttendance() {
     total: transformedData.length,
     present: transformedData.filter(record => record.checkInTime !== "--" && record.checkOutTime !== "--").length,
     absent: transformedData.filter(record => record.checkInTime === "--" && record.checkOutTime === "--").length,
-    late: transformedData.filter(record => record.reasonForLate !== "--" && record.reasonForLate !== null).length,
-    earlyOut: transformedData.filter(record => record.earlyOutReason !== "--" && record.earlyOutReason !== null).length,
+    late: transformedData.filter(record => record.status?.isLate).length,
+    earlyOut: transformedData.filter(record => record.status?.isEarlyOut).length,
   };
 
   // Handler functions for edit and delete actions
   const handleAttendanceEdit = (attendanceRecord) => {
     setEditingAttendance(attendanceRecord);
+    
+    // Format date properly for the input field
+    const formatDate = (dateString) => {
+      if (!dateString) return "";
+      // If it's already in YYYY-MM-DD format, return as is
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+        return dateString;
+      }
+      // If it's in ISO format, extract the date part
+      return dateString.split('T')[0];
+    };
+    
     setNewAttendance({
-      checkInTime: attendanceRecord.check_in_time || "",
-      checkOutTime: attendanceRecord.check_out_time || "",
-      reasonForLate: attendanceRecord.reason_for_late || "",
-      date: attendanceRecord.date || "",
-      earlyOutReason: attendanceRecord.early_out_reason || "",
+      checkInTime: formatTimeForInput(attendanceRecord.check_in_time) || "",
+      checkOutTime: formatTimeForInput(attendanceRecord.check_out_time) || "",
+      date: formatDate(attendanceRecord.date),
+      shiftId: attendanceRecord.shift_id || "",
     });
     setShowAddModal(true);
   };
@@ -102,9 +119,8 @@ export default function EmployeeAttendance() {
     setNewAttendance({
       checkInTime: "",
       checkOutTime: "",
-      reasonForLate: "",
       date: "",
-      earlyOutReason: "",
+      shiftId: "",
     });
   };
 
@@ -120,12 +136,22 @@ export default function EmployeeAttendance() {
     e.preventDefault();
     
     try {
+      // Validate time formats
+      if (newAttendance.checkInTime && !isValid12HourFormat(newAttendance.checkInTime)) {
+        alert('Please enter check-in time in 12-hour format (e.g., 9:00 AM)');
+        return;
+      }
+      
+      if (newAttendance.checkOutTime && !isValid12HourFormat(newAttendance.checkOutTime)) {
+        alert('Please enter check-out time in 12-hour format (e.g., 5:00 PM)');
+        return;
+      }
+
       const attendanceData = {
+        shift_id: newAttendance.shiftId || null,
         check_in_time: newAttendance.checkInTime || null,
         check_out_time: newAttendance.checkOutTime || null,
-        reason_for_late: newAttendance.reasonForLate || null,
         date: newAttendance.date,
-        early_out_reason: newAttendance.earlyOutReason || null,
       };
 
       console.log('Sending attendance data:', attendanceData);
@@ -195,7 +221,7 @@ export default function EmployeeAttendance() {
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
         <div className="bg-blue-50 rounded-lg shadow p-4 border-l-4 border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-in-out cursor-pointer">
           <div className="flex items-center">
             <div className="flex-shrink-0">
@@ -260,11 +286,11 @@ export default function EmployeeAttendance() {
           </div>
         </div>
         
-        <div className="bg-red-50 rounded-lg shadow p-4 border-l-4 border-red-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-in-out cursor-pointer">
+        <div className="bg-orange-50 rounded-lg shadow p-4 border-l-4 border-orange-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-in-out cursor-pointer">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
@@ -331,10 +357,10 @@ export default function EmployeeAttendance() {
               </button>
             </div>
             
-            <form onSubmit={handleSubmitAttendance} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <form onSubmit={handleSubmitAttendance} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Date *
                   </label>
                   <input
@@ -342,78 +368,74 @@ export default function EmployeeAttendance() {
                     name="date"
                     value={newAttendance.date}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Shift
+                  </label>
+                  <select
+                    name="shiftId"
+                    value={newAttendance.shiftId}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
+                  >
+                    <option value="">Select Shift (Optional)</option>
+                    {shifts.map((shift) => (
+                      <option key={shift.id} value={shift.id}>
+                        {shift.shift_name} ({shift.check_in} - {shift.check_out})
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Selecting a shift will automatically detect late arrivals and early departures
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Check-In Time *
                   </label>
                   <input
                     type="time"
                     name="checkInTime"
-                    value={newAttendance.checkInTime}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    value={formatTimeForInput(newAttendance.checkInTime)}
+                    onChange={(e) => setNewAttendance({...newAttendance, checkInTime: convertTimeInputToAPI(e.target.value)})}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
                     required
                   />
+                  <p className="text-xs text-gray-500 mt-1">Select time using the picker - will be saved as 12-hour format</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Check-Out Time
                   </label>
                   <input
                     type="time"
                     name="checkOutTime"
-                    value={newAttendance.checkOutTime}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    value={formatTimeForInput(newAttendance.checkOutTime)}
+                    onChange={(e) => setNewAttendance({...newAttendance, checkOutTime: convertTimeInputToAPI(e.target.value)})}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
                   />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Reason For Late
-                  </label>
-                  <input
-                    type="text"
-                    name="reasonForLate"
-                    value={newAttendance.reasonForLate}
-                    onChange={handleInputChange}
-                    placeholder="Enter reason if late"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Early Out Reason
-                  </label>
-                  <input
-                    type="text"
-                    name="earlyOutReason"
-                    value={newAttendance.earlyOutReason}
-                    onChange={handleInputChange}
-                    placeholder="Enter reason if left early"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  />
+                  <p className="text-xs text-gray-500 mt-1">Select time using the picker - will be saved as 12-hour format</p>
                 </div>
               </div>
 
-              <div className="flex justify-end space-x-3 pt-4">
+              <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
                 <button
                   type="button"
                   onClick={handleCloseModal}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  className="px-6 py-3 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  className="px-6 py-3 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors font-medium"
                 >
                   {editingAttendance ? "Update Attendance" : "Add Attendance"}
                 </button>

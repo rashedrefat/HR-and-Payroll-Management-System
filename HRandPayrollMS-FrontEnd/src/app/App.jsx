@@ -5,6 +5,7 @@ import { ToastContainer } from "react-toastify";
 import { initializeCsrfToken } from "../features/api/apiSlice";
 import { setToken, setUser } from "../features/auth/authSlice";
 import Routers from "../Routers/Routers";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 function App() {
   // Manage authenticated user state here
@@ -25,9 +26,10 @@ function App() {
   }, [dispatch]);
 
   return (
-    <AuthContext.Provider value={authValue}>
-      <Routers />
-      <ToastContainer
+    <ErrorBoundary>
+      <AuthContext.Provider value={authValue}>
+        <Routers />
+        <ToastContainer
         position="top-right"
         autoClose={2000}
         hideProgressBar={false}
@@ -38,7 +40,8 @@ function App() {
         draggable
         pauseOnHover
       />
-    </AuthContext.Provider>
+      </AuthContext.Provider>
+    </ErrorBoundary>
   );
 }
 

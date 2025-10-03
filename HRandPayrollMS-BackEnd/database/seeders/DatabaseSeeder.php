@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             DepartmentSeeder::class,
             DesignationSeeder::class,
             EmployeeSeeder::class,
+            LeaveTypeSeeder::class,
         ]);
     }
 }

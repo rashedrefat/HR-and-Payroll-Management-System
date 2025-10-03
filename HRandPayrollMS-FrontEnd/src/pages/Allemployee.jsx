@@ -25,6 +25,7 @@ const tableLabels = [
   { title: "Email", sort: true },
   { title: "Employee ID", sort: true },
   { title: "Mobile", sort: true },
+  { title: "Gender", sort: true },
   { title: "Department", sort: true },
   { title: "Designation", sort: true },
   { title: "Status", sort: true },
@@ -48,6 +49,7 @@ export default function AllEmployee() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [departmentFilter, setDepartmentFilter] = useState("All");
+  const [genderFilter, setGenderFilter] = useState("All");
   const [showBulkActions, setShowBulkActions] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState(null);
@@ -57,6 +59,7 @@ export default function AllEmployee() {
     email: '',
     employee_id: '',
     mobile: '',
+    gender: '',
     department_id: '',
     designation_id: '',
     joining_date: '',
@@ -78,6 +81,7 @@ export default function AllEmployee() {
       email: employee.email,
       employeeId: employee.employee_id,
       mobile: employee.mobile || "N/A",
+      gender: employee.gender ? employee.gender.charAt(0).toUpperCase() + employee.gender.slice(1) : "N/A",
       department: employee.department?.name || "N/A",
       designation: employee.designation?.title || "N/A",
       joiningDate: new Date(employee.joining_date).toLocaleDateString(),
@@ -86,7 +90,7 @@ export default function AllEmployee() {
     }));
   }, [employees]);
 
-  // Filter employees based on search, status, and department
+  // Filter employees based on search, status, department, and gender
   const filteredEmployees = useMemo(() => {
     return transformedEmployees.filter((employee) => {
       const matchesSearch = employee.name.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -97,9 +101,11 @@ export default function AllEmployee() {
       
       const matchesDepartment = departmentFilter === "All" || employee.department === departmentFilter;
       
-      return matchesSearch && matchesStatus && matchesDepartment;
+      const matchesGender = genderFilter === "All" || employee.gender.toLowerCase() === genderFilter.toLowerCase();
+      
+      return matchesSearch && matchesStatus && matchesDepartment && matchesGender;
     });
-  }, [transformedEmployees, searchTerm, statusFilter, departmentFilter]);
+  }, [transformedEmployees, searchTerm, statusFilter, departmentFilter, genderFilter]);
 
   // Get unique departments for filter dropdown
   const uniqueDepartments = useMemo(() => {
@@ -180,6 +186,7 @@ export default function AllEmployee() {
       email: employee.email,
       employee_id: employee.employee_id,
       mobile: employee.mobile || '',
+      gender: employee.gender || '',
       department_id: employee.department_id,
       designation_id: employee.designation_id,
       joining_date: employee.joining_date,
@@ -208,6 +215,7 @@ export default function AllEmployee() {
       email: '',
       employee_id: '',
       mobile: '',
+      gender: '',
       department_id: '',
       designation_id: '',
       joining_date: '',
@@ -288,7 +296,7 @@ export default function AllEmployee() {
           <IconButton
             text="Add Employee"
             color="text-white"
-            bg="bg-red-600"
+            bg="bg-pink-600"
             icon="/icons/plus-Icon.svg"
             className="hover:bg-red-700"
           />
@@ -332,6 +340,17 @@ export default function AllEmployee() {
               {uniqueDepartments.map(dept => (
                 <option key={dept} value={dept}>{dept}</option>
               ))}
+            </select>
+            
+            <select
+              value={genderFilter}
+              onChange={(e) => setGenderFilter(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="All">All Genders</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
             </select>
           </div>
 
@@ -450,6 +469,24 @@ export default function AllEmployee() {
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Gender *
+                </label>
+                <select
+                  name="gender"
+                  value={newEmployee.gender}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                >
+                  <option value="">Select Gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
               </div>
               
               <div>

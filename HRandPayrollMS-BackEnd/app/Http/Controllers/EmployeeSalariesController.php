@@ -46,9 +46,6 @@ class EmployeeSalariesController extends Controller
             'name' => $request->input('name'),
             'employee_id' => $request->input('employeeId') ?? $request->input('employee_id'),
             'salary' => $request->input('salary'),
-            'adjustment_amount' => $request->input('adjustmentAmount') ?? $request->input('adjustment_amount', 0),
-            'adjustment_reason' => $request->input('adjustmentReason') ?? $request->input('adjustment_reason'),
-            'after_adjustment_salary' => $request->input('afterAdjustmentSalary') ?? $request->input('after_adjustment_salary'),
             'month_year' => $request->input('monthYear') ?? $request->input('month_year'),
             'status' => $databaseStatus,
         ];
@@ -59,9 +56,7 @@ class EmployeeSalariesController extends Controller
             'name' => 'required|string|max:255',
             'employee_id' => 'required|string|max:255',
             'salary' => 'required|numeric|min:0',
-            'adjustment_amount' => 'nullable|numeric',
-            'adjustment_reason' => 'nullable|string|max:255',
-            'after_adjustment_salary' => 'required|numeric|min:0',
+            'month_year' => 'required|string|max:255',
             'status' => 'required|in:pending,paid,unpaid,approved,rejected',
         ]);
 
@@ -109,9 +104,6 @@ class EmployeeSalariesController extends Controller
             'name' => $request->input('name'),
             'employee_id' => $request->input('employeeId') ?? $request->input('employee_id'),
             'salary' => $request->input('salary'),
-            'adjustment_amount' => $request->input('adjustmentAmount') ?? $request->input('adjustment_amount'),
-            'adjustment_reason' => $request->input('adjustmentReason') ?? $request->input('adjustment_reason'),
-            'after_adjustment_salary' => $request->input('afterAdjustmentSalary') ?? $request->input('after_adjustment_salary'),
             'month_year' => $request->input('monthYear') ?? $request->input('month_year'),
             'status' => $databaseStatus,
         ];
@@ -127,9 +119,7 @@ class EmployeeSalariesController extends Controller
             'name' => 'sometimes|required|string|max:255',
             'employee_id' => 'sometimes|required|string|max:255',
             'salary' => 'sometimes|required|numeric|min:0',
-            'adjustment_amount' => 'nullable|numeric',
-            'adjustment_reason' => 'nullable|string|max:255',
-            'after_adjustment_salary' => 'sometimes|required|numeric|min:0',
+            'month_year' => 'sometimes|required|string|max:255',
             'status' => 'sometimes|required|in:pending,paid,unpaid,approved,rejected',
         ]);
 

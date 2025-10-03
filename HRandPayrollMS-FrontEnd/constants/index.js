@@ -18,7 +18,7 @@ export const adminLinks = [
     
   },
   {
-    title: "Leave Application",
+    title: "Leave Management",
     icon: "/icons/leave.svg",
     link: "leave",
   },

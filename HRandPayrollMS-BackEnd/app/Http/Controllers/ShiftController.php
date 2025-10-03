@@ -29,8 +29,8 @@ class ShiftController extends Controller
         $validated = $request->validate([
             'shift_name' => 'required|string|max:255',
             'type' => 'nullable|string|max:255',
-            'check_in' => 'required|date_format:H:i',
-            'check_out' => 'required|date_format:H:i',
+            'check_in' => 'required|regex:/^\d{1,2}:\d{2}\s?(AM|PM)$/i',
+            'check_out' => 'required|regex:/^\d{1,2}:\d{2}\s?(AM|PM)$/i',
             'grace_time' => 'nullable|integer|min:0',
             'working_days' => 'required|array',
             'weekends' => 'nullable|array',
@@ -52,8 +52,8 @@ class ShiftController extends Controller
         $validated = $request->validate([
             'shift_name' => 'sometimes|string|max:255',
             'type' => 'sometimes|string|max:255',
-            'check_in' => 'sometimes|date_format:H:i',
-            'check_out' => 'sometimes|date_format:H:i',
+            'check_in' => 'sometimes|regex:/^\d{1,2}:\d{2}\s?(AM|PM)$/i',
+            'check_out' => 'sometimes|regex:/^\d{1,2}:\d{2}\s?(AM|PM)$/i',
             'grace_time' => 'sometimes|integer|min:0',
             'working_days' => 'sometimes|array',
             'weekends' => 'sometimes|array',

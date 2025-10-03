@@ -16,8 +16,10 @@ class Employee extends Model
         'email',
         'employee_id',
         'mobile',
+        'gender',
         'department_id',
         'designation_id',
+        'default_shift_id',
         'status',
         'joining_date',
         'image',
@@ -33,5 +35,11 @@ class Employee extends Model
     public function designation()
     {
         return $this->belongsTo(Designations::class, 'designation_id');
+    }
+
+    // Employee belongs to a default shift
+    public function defaultShift()
+    {
+        return $this->belongsTo(Shift::class, 'default_shift_id');
     }
 }

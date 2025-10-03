@@ -22,6 +22,8 @@ export const employeeApiSlice = apiSlice.injectEndpoints({
     getEmployeeProfile: builder.query({
       query: () => "/employee/profile",
       providesTags: ["EmployeeProfile"],
+      // Skip query if no authentication token is present
+      skip: () => !localStorage.getItem("access_token"),
     }),
     
     // Create new employee

@@ -2,15 +2,30 @@ import { useMemo } from 'react';
 import { useGetEmployeeProfileQuery } from '../../features/api/employeeApiSlice';
 
 export const useCurrentEmployee = () => {
-  const { data: employeeData, isLoading, error } = useGetEmployeeProfileQuery();
+  const { data: employeeData, isLoading, error, refetch } = useGetEmployeeProfileQuery();
 
-  // Debug logging
+  // Enhanced debug logging
   console.log('useCurrentEmployee - isLoading:', isLoading);
   console.log('useCurrentEmployee - error:', error);
   console.log('useCurrentEmployee - employeeData:', employeeData);
+  
+  // Check authentication state
+  const token = localStorage.getItem("access_token");
+  const storedUser = localStorage.getItem("user");
+  const storedEmployee = localStorage.getItem("employee");
+  
+  console.log('useCurrentEmployee - auth token exists:', !!token);
+  console.log('useCurrentEmployee - stored user:', storedUser);
+  console.log('useCurrentEmployee - stored employee:', storedEmployee);
+  
   if (employeeData) {
-    console.log('useCurrentEmployee - designation specifically:', employeeData.designation);
-    console.log('useCurrentEmployee - department specifically:', employeeData.department);
+    console.log('useCurrentEmployee - API returned employee:', {
+      name: employeeData.name,
+      email: employeeData.email,
+      employee_id: employeeData.employee_id,
+      designation: employeeData.designation,
+      department: employeeData.department
+    });
   }
 
   const formattedEmployeeData = useMemo(() => {
@@ -92,6 +107,7 @@ export const useCurrentEmployee = () => {
       email: employeeData.email,
       phone: employeeData.mobile,
       mobile: employeeData.mobile,
+      gender: employeeData.gender,
       joinDate: employeeData.joining_date,
       joiningDate: employeeData.joining_date,
       // Use the full image URL from backend or fallback to default
@@ -113,8 +129,6 @@ export const useCurrentEmployee = () => {
     ...formattedEmployeeData,
     isLoading,
     error,
-    refetch: () => {
-      // Re-fetch employee data if needed
-    }
+    refetch: refetch // Pass through the actual refetch function
   };
 };

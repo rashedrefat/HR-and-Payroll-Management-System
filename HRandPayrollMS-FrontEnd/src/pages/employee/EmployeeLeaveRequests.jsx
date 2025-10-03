@@ -1,34 +1,109 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   useGetMyLeaveRequestsQuery,
   useCreateLeaveRequestMutation,
   useUpdateLeaveRequestMutation,
   useDeleteLeaveRequestMutation,
 } from "../../features/leave/leaveRequestApiSlice";
+import {
+  useGetLeaveTypesQuery,
+} from "../../features/api/leaveTypeApi";
+import { useCurrentEmployee } from "../../components/hooks/useCurrentEmployee";
 
 export default function EmployeeLeaveRequests() {
+  // All hooks must be declared before any early returns
   const [showNewRequestForm, setShowNewRequestForm] = useState(false);
   const [editingRequest, setEditingRequest] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteRequestId, setDeleteRequestId] = useState(null);
-  
-  // API hooks
-  const { 
-    data: leaveRequests = [], 
-    isLoading, 
-    error 
-  } = useGetMyLeaveRequestsQuery();
-  
-  const [createLeaveRequest] = useCreateLeaveRequestMutation();
-  const [updateLeaveRequest] = useUpdateLeaveRequestMutation();
-  const [deleteLeaveRequest] = useDeleteLeaveRequestMutation();
-
   const [newRequest, setNewRequest] = useState({
-    type: "Annual Leave",
+    type: "",
     startDate: "",
     endDate: "",
     reason: ""
   });
+  
+  // API hooks with comprehensive error handling
+  const { 
+    data: leaveRequests = [], 
+    isLoading, 
+    error,
+    refetch: refetchLeaveRequests
+  } = useGetMyLeaveRequestsQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+    retry: 3,
+    retryDelay: 1000,
+  });
+  
+  const { 
+    data: leaveTypes = [],
+    isLoading: isLoadingLeaveTypes,
+    error: leaveTypesError,
+    refetch: refetchLeaveTypes
+  } = useGetLeaveTypesQuery(undefined, {
+    retry: 3,
+    retryDelay: 1000,
+  });
+
+  const [createLeaveRequest] = useCreateLeaveRequestMutation();
+  const [updateLeaveRequest] = useUpdateLeaveRequestMutation();
+  const [deleteLeaveRequest] = useDeleteLeaveRequestMutation();
+
+  // Get current employee info including gender
+  const { gender } = useCurrentEmployee();
+
+  // Filter leave types based on gender
+  const filteredLeaveTypes = useMemo(() => {
+    if (!leaveTypes.length || !gender) return leaveTypes;
+    
+    return leaveTypes.filter(leaveType => {
+      const leaveTypeLower = leaveType.leave_type?.toLowerCase() || '';
+      
+      // Male employees cannot apply for maternity leave
+      if (gender.toLowerCase() === 'male' && leaveTypeLower.includes('maternity')) {
+        return false;
+      }
+      
+      // Female employees cannot apply for paternity leave
+      if (gender.toLowerCase() === 'female' && leaveTypeLower.includes('paternity')) {
+        return false;
+      }
+      
+      return true;
+    });
+  }, [leaveTypes, gender]);
+
+  // Calculate remaining leave days for each leave type (using filtered leave types)
+  const remainingLeaveDays = useMemo(() => {
+    if (!filteredLeaveTypes.length || !leaveRequests.length) return {};
+    
+    console.log('Leave Requests Data:', leaveRequests);
+    console.log('Filtered Leave Types Data:', filteredLeaveTypes);
+    
+    const remaining = {};
+    
+    filteredLeaveTypes.forEach(leaveType => {
+      const totalAllowed = leaveType.days;
+      const relevantRequests = leaveRequests
+        .filter(request => 
+          request.leave_type?.toLowerCase() === leaveType.leave_type?.toLowerCase() && 
+          (request.status?.toLowerCase() === 'approved' || request.status?.toLowerCase() === 'pending')
+        );
+      
+      const usedDays = relevantRequests.reduce((sum, request) => sum + (request.days || 0), 0);
+      
+      console.log(`${leaveType.leave_type}:`, {
+        totalAllowed,
+        relevantRequests,
+        usedDays,
+        remaining: Math.max(0, totalAllowed - usedDays)
+      });
+      
+      remaining[leaveType.leave_type] = Math.max(0, totalAllowed - usedDays);
+    });
+    
+    return remaining;
+  }, [filteredLeaveTypes, leaveRequests]);
 
   // Calculate days between two dates
   const calculateDays = (startDate, endDate) => {
@@ -39,6 +114,54 @@ export default function EmployeeLeaveRequests() {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end dates
     return diffDays;
   };
+
+  // Show loading state if either query is loading
+  if (isLoading || isLoadingLeaveTypes) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading leave requests...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state with retry option
+  if (error || leaveTypesError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="max-w-md w-full bg-white rounded-lg shadow p-6">
+          <div className="flex items-center mb-4">
+            <svg className="w-8 h-8 text-red-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h2 className="text-lg font-semibold text-gray-900">Unable to Load Data</h2>
+          </div>
+          <p className="text-gray-600 mb-4">
+            {error?.message || leaveTypesError?.message || 'Failed to load leave requests. Please check your connection and try again.'}
+          </p>
+          <div className="flex space-x-3">
+            <button
+              onClick={() => {
+                refetchLeaveRequests();
+                refetchLeaveTypes();
+              }}
+              className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              Retry
+            </button>
+            <button
+              onClick={() => window.location.reload()}
+              className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            >
+              Refresh Page
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -54,6 +177,26 @@ export default function EmployeeLeaveRequests() {
     try {
       // Calculate days between dates
       const days = calculateDays(newRequest.startDate, newRequest.endDate);
+      
+      // Find the selected leave type
+      const selectedLeaveType = leaveTypes.find(lt => lt.leave_type === newRequest.type);
+      if (!selectedLeaveType) {
+        alert('Please select a valid leave type');
+        return;
+      }
+      
+      // Check if requested days exceed the maximum allowed for this leave type
+      if (days > selectedLeaveType.days) {
+        alert(`You cannot request more than ${selectedLeaveType.days} days for ${selectedLeaveType.leave_type}`);
+        return;
+      }
+      
+      // Check if requested days exceed remaining available days
+      const availableDays = remainingLeaveDays[newRequest.type] || 0;
+      if (days > availableDays) {
+        alert(`You only have ${availableDays} days remaining for ${newRequest.type}`);
+        return;
+      }
       
       // Prepare data - let backend determine employee details from authenticated user
       const requestData = {
@@ -83,7 +226,7 @@ export default function EmployeeLeaveRequests() {
       setShowNewRequestForm(false);
       setEditingRequest(null);
       setNewRequest({
-        type: "Annual Leave",
+        type: "",
         startDate: "",
         endDate: "",
         reason: ""
@@ -91,6 +234,11 @@ export default function EmployeeLeaveRequests() {
     } catch (error) {
       console.error('Failed to save leave request:', error);
       console.error('Error data:', error.data);
+      
+      // Show specific error message from server
+      const errorMessage = error.data?.message || error.data?.error || error.message || 'Unknown error occurred';
+      
+      alert('❌ Failed to save leave request:\n\n' + errorMessage);
     }
   };
 
@@ -98,7 +246,7 @@ export default function EmployeeLeaveRequests() {
     setShowNewRequestForm(false);
     setEditingRequest(null);
     setNewRequest({
-      type: "Annual Leave",
+      type: "",
       startDate: "",
       endDate: "",
       reason: ""
@@ -274,6 +422,30 @@ export default function EmployeeLeaveRequests() {
         </div>
       )}
 
+      {/* Compact Leave Balance Summary */}
+      {!isLoading && leaveTypes.length > 0 && (
+        <div className="mt-6 bg-gray-50 rounded-lg p-4">
+          <h3 className="text-sm font-medium text-gray-700 mb-3">Leave Balance</h3>
+          <div className="flex flex-wrap gap-4">
+            {leaveTypes.map((leaveType) => {
+              const remaining = remainingLeaveDays[leaveType.leave_type] || 0;
+              
+              return (
+                <div key={leaveType.id} className="flex items-center space-x-2 bg-white rounded px-3 py-2 border">
+                  <span className="text-sm font-medium text-gray-900">{leaveType.leave_type}:</span>
+                  <span className={`text-sm font-semibold ${
+                    remaining > 5 ? 'text-green-600' : 
+                    remaining > 0 ? 'text-yellow-600' : 'text-red-600'
+                  }`}>
+                    {remaining} days left
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* New Leave Request Modal */}
       {showNewRequestForm && (
         <div className="fixed inset-0 backdrop-blur-md flex items-center justify-center z-50">
@@ -304,13 +476,25 @@ export default function EmployeeLeaveRequests() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
                   required
                 >
-                  <option value="Annual Leave">Annual Leave</option>
-                  <option value="Sick Leave">Sick Leave</option>
-                  <option value="Emergency Leave">Emergency Leave</option>
-                  <option value="Maternity Leave">Maternity Leave</option>
-                  <option value="Paternity Leave">Paternity Leave</option>
-                  <option value="Personal Leave">Personal Leave</option>
+                  <option value="">Select leave type...</option>
+                  {filteredLeaveTypes.map((leaveType) => (
+                    <option key={leaveType.id} value={leaveType.leave_type}>
+                      {leaveType.leave_type} ({remainingLeaveDays[leaveType.leave_type] || 0} days remaining)
+                    </option>
+                  ))}
                 </select>
+                {/* Show information about filtered leave types */}
+                {leaveTypes.length > filteredLeaveTypes.length && (
+                  <p className="text-sm text-amber-600 mt-1 italic">
+                    ℹ️ Note: {gender === 'male' ? 'Maternity leave is not available for male employees' : 'Paternity leave is not available for female employees'}
+                  </p>
+                )}
+                {newRequest.type && remainingLeaveDays[newRequest.type] !== undefined && (
+                  <p className="text-sm text-gray-600 mt-1">
+                    Maximum allowed: {filteredLeaveTypes.find(lt => lt.leave_type === newRequest.type)?.days || 0} days | 
+                    Remaining: {remainingLeaveDays[newRequest.type]} days
+                  </p>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -350,7 +534,7 @@ export default function EmployeeLeaveRequests() {
                 </div>
               )}
 
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Reason
                 </label>
@@ -363,7 +547,7 @@ export default function EmployeeLeaveRequests() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none resize-none"
                   required
                 />
-              </div>
+              </div> */}
 
               <div className="flex justify-end space-x-3 pt-4">
                 <button

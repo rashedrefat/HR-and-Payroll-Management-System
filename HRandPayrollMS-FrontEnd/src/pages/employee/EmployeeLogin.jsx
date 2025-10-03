@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { useLoginMutation, setToken, setUser } from "../../features/auth/authSlice";
+import { apiSlice } from "../../features/api/apiSlice";
 
 export default function EmployeeLogin() {
   const [formData, setFormData] = useState({
@@ -19,6 +20,16 @@ export default function EmployeeLogin() {
     
     try {
       console.log("Attempting employee login with:", { email: formData.email, password: formData.password });
+      
+      // Clear all previous authentication data before login
+      localStorage.removeItem("user");
+      localStorage.removeItem("employee");
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+      localStorage.removeItem("userRole");
+      
+      // Clear Redux state and RTK Query cache
+      dispatch(apiSlice.util.resetApiState());
       
       const response = await login({ 
         email: formData.email, 

@@ -10,7 +10,7 @@ export default function EmployeeNavbar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [showDropdown, setShowDropdown] = useState(false);
-  const [notificationPopup, setNotificationPopup] = useState(false);
+  // const [notificationPopup, setNotificationPopup] = useState(false);
   const dropdownRef = useRef(null);
   const currentEmployee = useCurrentEmployee();
 
@@ -101,16 +101,9 @@ export default function EmployeeNavbar() {
               </button>
             </div>
 
-            {/* Theme/Settings Button */}
-            <button className="hidden md:flex items-center justify-center p-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500/30 backdrop-blur-sm border border-gray-200">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </button>
 
             {/* Notifications */}
-            <div className="relative">
+            {/* <div className="relative">
               <button
                 onClick={() => setNotificationPopup(!notificationPopup)}
                 className="relative p-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500/30 backdrop-blur-sm border border-gray-200"
@@ -121,14 +114,14 @@ export default function EmployeeNavbar() {
                 </svg>
                 
                 {/* Enhanced Notification Badge */}
-                <span className="absolute -top-1 -right-1 flex h-6 w-6">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                {/* <span className="absolute -top-1 -right-1 flex h-6 w-6"> */}
+                  {/* <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-6 w-6 bg-gradient-to-r from-red-500 to-red-600 items-center justify-center shadow-lg border-2 border-white">
                     <span className="text-xs font-bold text-white drop-shadow-sm">3</span>
                   </span>
                 </span>
-              </button>
-            </div>
+              </button> */}
+            {/* </div>  */}
 
             {/* User Profile Dropdown */}
             <div className="relative" ref={dropdownRef}>

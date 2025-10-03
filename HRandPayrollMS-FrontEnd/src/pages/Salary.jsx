@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link } from "react-router-dom";
 import Table from "../components/table/Table";
 import SalarySettingsRow from "../components/table/rows/SalarySettingsRow";
@@ -16,6 +16,7 @@ import {
   useUpdateEmployeeSalaryMutation,
   useDeleteEmployeeSalaryMutation,
 } from "../features/api/employeeSalariesApiSlice";
+import { useGetIncrementsQuery } from "../features/api/incrementApi";
 
 export default function Salary() {
   const [activeTab, setActiveTab] = useState('payslip'); // Changed to show payslip tab by default
@@ -50,9 +51,6 @@ export default function Salary() {
     name: '',
     employee_id: '',
     salary: '',
-    adjustment_amount: '',
-    adjustment_reason: '',
-    after_adjustment_salary: '',
     monthYear: '', // e.g., 'August 2025'
     status: 'pending'
   });
@@ -74,19 +72,52 @@ export default function Salary() {
   const [updateEmployeeSalary] = useUpdateEmployeeSalaryMutation();
   const [deleteEmployeeSalary] = useDeleteEmployeeSalaryMutation();
 
+  // API hooks - Increments (for getting current salary data)
+  const { data: increments = [], isLoading: isLoadingIncrements } = useGetIncrementsQuery();
+
+  // Merge employee salaries with increment data to ensure salary consistency
+  const mergedSalaryData = useMemo(() => {
+    if (!employeeSalaries.length || !increments.length) return employeeSalaries;
+    
+    return employeeSalaries.map(salaryRecord => {
+      // Find the corresponding increment record by employee_id
+      const incrementRecord = increments.find(inc => inc.employee_id === salaryRecord.employeeId);
+      
+      // If increment exists, use its salary as the authoritative source
+      if (incrementRecord) {
+        return {
+          ...salaryRecord,
+          salary: incrementRecord.salary, // Use increment salary as authoritative
+        };
+      }
+      
+      // If no increment record found, keep original salary
+      return salaryRecord;
+    });
+  }, [employeeSalaries, increments]);
+
   // Debug logs
   console.log('🔍 Employee Salaries Debug:');
   console.log('- Data:', employeeSalaries);
   console.log('- Loading:', isLoadingEmployeeSalaries);
   console.log('- Error:', employeeSalariesError);
   console.log('- Data length:', employeeSalaries?.length);
+  console.log('🔍 Increments Debug:');
+  console.log('- Increments Data:', increments);
+  console.log('- Loading Increments:', isLoadingIncrements);
+  console.log('🔍 Merged Data Sample:');
+  if (mergedSalaryData.length > 0) {
+    const sample = mergedSalaryData[0];
+    console.log('- Sample Record:', sample);
+    console.log('- Salary:', sample.salary);
+  }
 
   // Filter payslip records by employee name search
   const displayPayslipRecords = employeeSearch.trim()
-    ? employeeSalaries.filter(record =>
+    ? mergedSalaryData.filter(record =>
         record.name.toLowerCase().includes(employeeSearch.toLowerCase())
       )
-    : employeeSalaries;
+    : mergedSalaryData;
 
   // Table headers for salary settings
   const salarySettingsLabels = [
@@ -101,9 +132,6 @@ export default function Salary() {
     { title: "Employee ID", sort: true },
     { title: "Month & Year", sort: true },
     { title: "Salary", sort: true },
-    { title: "Adjustment Amount", sort: true },
-    { title: "Adjustment Reason", sort: true },
-    { title: "After Adjustment Salary", sort: true },
     { title: "Status", sort: true },
     { title: "Action", sort: false },
   ];
@@ -312,9 +340,6 @@ export default function Salary() {
       name: '',
       employee_id: '',
       salary: '',
-      adjustment_amount: '',
-      adjustment_reason: '',
-      after_adjustment_salary: '',
       monthYear: '',
       status: 'pending'
     });
@@ -328,9 +353,6 @@ export default function Salary() {
           name: newSalary.name,
           employeeId: newSalary.employee_id,
           salary: parseFloat(newSalary.salary),
-          adjustmentAmount: parseFloat(newSalary.adjustment_amount) || 0,
-          adjustmentReason: newSalary.adjustment_reason,
-          afterAdjustmentSalary: parseFloat(newSalary.after_adjustment_salary),
           monthYear: newSalary.monthYear,
           status: newSalary.status
         }).unwrap();
@@ -350,15 +372,17 @@ export default function Salary() {
       [field]: value
     }));
     
-    // Auto-calculate after adjustment salary when salary or adjustment amount changes
-    if (field === 'salary' || field === 'adjustment_amount') {
-      const salary = parseFloat(field === 'salary' ? value : newSalary.salary) || 0;
-      const adjustment = parseFloat(field === 'adjustment_amount' ? value : newSalary.adjustment_amount) || 0;
-      setNewSalary(prev => ({
-        ...prev,
-        [field]: value,
-        after_adjustment_salary: (salary + adjustment).toString()
-      }));
+    // Auto-populate salary from increment table when employee_id is selected
+    if (field === 'employee_id' && value) {
+      const incrementRecord = increments.find(inc => inc.employee_id === value);
+      if (incrementRecord) {
+        setNewSalary(prev => ({
+          ...prev,
+          [field]: value,
+          salary: incrementRecord.salary.toString(), // Auto-populate from increment table
+        }));
+        return; // Early return to avoid double setting
+      }
     }
   };
 
@@ -369,9 +393,6 @@ export default function Salary() {
       name: payslip.name,
       employee_id: payslip.employeeId,
       salary: payslip.salary.toString(),
-      adjustment_amount: payslip.adjustmentAmount.toString(),
-      adjustment_reason: payslip.adjustmentReason,
-      after_adjustment_salary: payslip.afterAdjustmentSalary.toString(),
       monthYear: payslip.monthYear || '',
       status: payslip.status
     });
@@ -385,11 +406,8 @@ export default function Salary() {
         await updateEmployeeSalary({
           id: editingPayslip.id,
           name: newSalary.name,
-          employee_id: newSalary.employee_id,
+          employeeId: newSalary.employee_id,
           salary: parseFloat(newSalary.salary),
-          adjustment_amount: parseFloat(newSalary.adjustment_amount) || 0,
-          adjustment_reason: newSalary.adjustment_reason,
-          after_adjustment_salary: parseFloat(newSalary.after_adjustment_salary),
           monthYear: newSalary.monthYear,
           status: newSalary.status
         }).unwrap();
@@ -398,9 +416,6 @@ export default function Salary() {
           name: '',
           employee_id: '',
           salary: '',
-          adjustment_amount: '',
-          adjustment_reason: '',
-          after_adjustment_salary: '',
           monthYear: '',
           status: 'pending'
         });
@@ -430,9 +445,6 @@ export default function Salary() {
       name: '',
       employee_id: '',
       salary: '',
-      adjustment_amount: '',
-      adjustment_reason: '',
-      after_adjustment_salary: '',
       status: 'pending'
     });
   };
@@ -469,7 +481,7 @@ export default function Salary() {
                 : 'text-gray-600 hover:text-gray-900'
             }`}
           >
-            Salary Settings
+            Salary Structure
           </button>
           <button
             onClick={() => setActiveTab('payslip')}
@@ -629,7 +641,7 @@ export default function Salary() {
               </button>
             </div>
             <div className="p-6">
-              {isLoadingEmployeeSalaries ? (
+              {isLoadingEmployeeSalaries || isLoadingIncrements ? (
                 <div className="flex justify-center items-center py-8">
                   <div className="text-gray-500">Loading payslip records...</div>
                 </div>
@@ -833,50 +845,9 @@ export default function Salary() {
                   placeholder="Enter base salary"
                   required
                 />
-              </div>
-
-              <div>
-                <label htmlFor="adjustmentAmount" className="block text-sm font-medium text-gray-700 mb-2">
-                  Adjustment Amount
-                </label>
-                <input
-                  id="adjustmentAmount"
-                  type="number"
-                  step="0.01"
-                  value={newSalary.adjustment_amount}
-                  onChange={(e) => handleSalaryInputChange('adjustment_amount', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                  placeholder="Enter adjustment amount"
-                />
-              </div>
-
-              <div className="sm:col-span-2">
-                <label htmlFor="adjustmentReason" className="block text-sm font-medium text-gray-700 mb-2">
-                  Adjustment Reason
-                </label>
-                <input
-                  id="adjustmentReason"
-                  type="text"
-                  value={newSalary.adjustment_reason}
-                  onChange={(e) => handleSalaryInputChange('adjustment_reason', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                  placeholder="Enter adjustment reason"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="afterAdjustmentSalary" className="block text-sm font-medium text-gray-700 mb-2">
-                  Final Salary (Auto-calculated)
-                </label>
-                <input
-                  id="afterAdjustmentSalary"
-                  type="number"
-                  step="0.01"
-                  value={newSalary.after_adjustment_salary}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 cursor-not-allowed"
-                  placeholder="Auto-calculated"
-                  readOnly
-                />
+                <p className="mt-1 text-xs text-gray-500">
+                  💡 Salary will auto-populate from increment records when Employee ID is entered
+                </p>
               </div>
 
               <div>
@@ -1013,51 +984,9 @@ export default function Salary() {
                   placeholder="Enter base salary"
                   required
                 />
-              </div>
-              
-              <div>
-                <label htmlFor="editAdjustmentAmount" className="block text-sm font-medium text-gray-700 mb-2">
-                  Adjustment Amount
-                </label>
-                <input
-                  id="editAdjustmentAmount"
-                  type="number"
-                  step="0.01"
-                  value={newSalary.adjustment_amount}
-                  onChange={(e) => handleSalaryInputChange('adjustment_amount', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                  placeholder="Enter adjustment amount"
-                />
-              </div>
-              
-              <div className="sm:col-span-2">
-                <label htmlFor="editAdjustmentReason" className="block text-sm font-medium text-gray-700 mb-2">
-                  Adjustment Reason
-                </label>
-                <textarea
-                  id="editAdjustmentReason"
-                  rows="3"
-                  value={newSalary.adjustment_reason}
-                  onChange={(e) => handleSalaryInputChange('adjustment_reason', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                  placeholder="Enter adjustment reason"
-                />
-              </div>
-              
-              <div>
-                <label htmlFor="editAfterAdjustmentSalary" className="block text-sm font-medium text-gray-700 mb-2">
-                  After Adjustment Salary
-                </label>
-                <input
-                  id="editAfterAdjustmentSalary"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={newSalary.after_adjustment_salary}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 focus:outline-none"
-                  placeholder="Auto-calculated"
-                  readOnly
-                />
+                <p className="mt-1 text-xs text-gray-500">
+                  💡 Salary will auto-populate from increment records when Employee ID is entered
+                </p>
               </div>
               
               <div>

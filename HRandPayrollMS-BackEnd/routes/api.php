@@ -43,6 +43,7 @@ Route::middleware('auth:sanctum')->get('employee/profile', [EmployeeController::
 
 // Leave Requests Routes
 Route::get('leave-requests', [LeaveRequestController::class, 'index']); // Admin: Get all leave requests
+Route::delete('admin/leave-requests/{id}', [LeaveRequestController::class, 'adminDestroy']); // Admin: Delete any leave request
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('my-leave-requests', [LeaveRequestController::class, 'myLeaveRequests']); // Employee: Get own leave requests
     Route::post('leave-requests', [LeaveRequestController::class, 'store']);

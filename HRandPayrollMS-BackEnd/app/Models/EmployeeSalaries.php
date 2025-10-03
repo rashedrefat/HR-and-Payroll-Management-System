@@ -15,9 +15,6 @@ class EmployeeSalaries extends Model
         'name',
         'employee_id',
         'salary',
-        'adjustment_amount',
-        'adjustment_reason',
-        'after_adjustment_salary',
         'month_year',
         'status',
     ];
